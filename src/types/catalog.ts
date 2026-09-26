@@ -33,6 +33,7 @@ export interface RawSeriesItem {
   anno: number | null;
   trama: string;
   voto: number | null;
+  generi?: string[];
   regista?: string;
   attori?: string[];
   stagioni: RawSeasonItem[];
@@ -56,6 +57,7 @@ export interface RawFilmItem {
   sottotitoli: string;
   dimensione_gb: number | null;
   file_path: string;
+  generi?: string[];
   regista?: string;
   attori?: string[];
 }
@@ -120,6 +122,9 @@ export interface CatalogStats {
   totalEpisodes: number;
   totalStorageGb: number;
   lastUpdatedDisplay: string;
+  lastUpdatedIso?: string;
+  daysSinceUpdate?: number;
+  isOutdated?: boolean;
 }
 
 export type SortField = 'titolo' | 'anno' | 'dimensione_gb' | 'durata_min' | 'voto';

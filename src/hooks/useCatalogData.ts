@@ -83,7 +83,12 @@ export function useCatalogData(): UseCatalogDataResult {
           const size = film.dimensione_gb || 0;
           totalStorageGb += size;
 
-          const genres = classifyGenres(film.titolo, film.trama || '', 'film');
+          const explicitGenres = Array.isArray(film.generi) && film.generi.length > 0
+            ? film.generi.map((g) => g.trim()).filter(Boolean)
+            : [];
+          const genres = explicitGenres.length > 0
+            ? explicitGenres
+            : classifyGenres(film.titolo, film.trama || '', 'film');
           const director = extractDirector(film);
           const actors = extractActors(film);
 
@@ -188,7 +193,12 @@ export function useCatalogData(): UseCatalogDataResult {
 
             totalStorageGb += seriesStorage;
 
-            const genres = classifyGenres(series.titolo, series.trama || '', section);
+            const explicitGenres = Array.isArray(series.generi) && series.generi.length > 0
+              ? series.generi.map((g) => g.trim()).filter(Boolean)
+              : [];
+            const genres = explicitGenres.length > 0
+              ? explicitGenres
+              : classifyGenres(series.titolo, series.trama || '', section);
             const director = extractDirector(series);
             const actors = extractActors(series);
 
@@ -239,6 +249,18 @@ export function useCatalogData(): UseCatalogDataResult {
           });
         }
 
+        const lastUpdatedIso = rawData.metadata?.last_updated || '';
+        let daysSinceUpdate = 0;
+        let isOutdated = false;
+        if (lastUpdatedIso) {
+          const lastDate = new Date(lastUpdatedIso);
+          if (!isNaN(lastDate.getTime())) {
+            const diffMs = Date.now() - lastDate.getTime();
+            daysSinceUpdate = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+            isOutdated = daysSinceUpdate > 7;
+          }
+        }
+
         const calculatedStats: CatalogStats = {
           totalTitles: unifiedList.length,
           totalFilms: films.length,
@@ -247,7 +269,10 @@ export function useCatalogData(): UseCatalogDataResult {
           totalCartoons: (rawData.catalog.cartoon || []).length,
           totalEpisodes: totalEpisodesCount,
           totalStorageGb: Number(totalStorageGb.toFixed(2)),
-          lastUpdatedDisplay: rawData.metadata?.last_updated_display || 'Oggi'
+          lastUpdatedDisplay: rawData.metadata?.last_updated_display || 'Oggi',
+          lastUpdatedIso,
+          daysSinceUpdate,
+          isOutdated
         };
 
         if (!isCancelled) {

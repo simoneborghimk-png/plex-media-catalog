@@ -324,4 +324,23 @@ npm run preview
 I file compilati e ottimizzati verranno generati nella cartella `dist/`.
 
 ---
+
+## 6. Pipeline di Esportazione Plex & Politica di Freschezza Dati (7 Giorni)
+
+### 6.1 Script di Esportazione Plex (`scripts/export_plex.py`)
+I dati primari risiedono nel database SQLite originale di Plex Media Server (`com.plexapp.plugins.library.db`).
+Per estrarre i metadati completi:
+1. **Regista (Director)**: registrato nella tabella `taggings` con `tag_type = 4` collegato alla tabella `tags`.
+2. **Attori Principali (Cast)**: registrati in `taggings` con `tag_type = 6`. Il campo `tg."index"` definisce l'ordine di importanza/billing (0 = protagonista primario, 1 = co-protagonista, ecc.). Vengono estratti i primi 5 attori in ordine di indice.
+3. **Generi (Genres)**: registrati in `taggings` con `tag_type = 1`.
+4. Lo script effettua una copia temporanea a caldo (`safe_copy_database`) includendo i file `-wal` e `-shm` per evitare deadlock SQLite durante l'esecuzione del server Plex.
+5. I file generati (`catalog_data.json` e i CSV di supporto) vengono sincronizzati via LAN SMB su `DEV_MACHINE_DATA_DIR`.
+
+### 6.2 Politica di Verifica Freschezza (7 Giorni)
+- Ogni esportazione appone nel JSON il timestamp ISO `metadata.last_updated` e `metadata.last_updated_display`.
+- Sia l'assistente AI sia l'interfaccia utente (tramite badge e banner in `Header.tsx`) verificano se `daysSinceUpdate > 7`:
+  - Se i dati superano i 7 giorni, viene mostrato un avviso esplicito che invita l'utente a rilanciare `export_plex.py` sul server Plex.
+
+
+---
 *Fine delle linee guida architetturali. Proseguire con la FASE 2: Implementazione del Progetto.*

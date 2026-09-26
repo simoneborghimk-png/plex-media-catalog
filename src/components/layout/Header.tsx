@@ -6,7 +6,8 @@ import {
   Smile,
   HardDrive,
   Clock,
-  Layers
+  Layers,
+  AlertTriangle
 } from 'lucide-react';
 import { CatalogStats, MediaSection } from '../../types/catalog';
 import { formatStorage } from '../../utils/formatters';
@@ -64,16 +65,43 @@ export const Header: React.FC<HeaderProps> = ({
                   {formatStorage(stats.totalStorageGb)}
                 </span>
               </div>
-              <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/80 border border-white/[0.06]">
-                <Clock className="w-3.5 h-3.5 text-sky-400" />
-                <span>Aggiornato:</span>
-                <span className="text-slate-300">
+              <div
+                className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-all ${
+                  stats.isOutdated
+                    ? 'bg-amber-500/15 border-amber-500/40 text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.2)]'
+                    : 'bg-slate-900/80 border-white/[0.06] text-slate-400'
+                }`}
+                title={stats.isOutdated ? `Catalogo aggiornato ${stats.daysSinceUpdate} giorni fa. Consigliato nuovo export da Plex.` : undefined}
+              >
+                {stats.isOutdated ? (
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+                ) : (
+                  <Clock className="w-3.5 h-3.5 text-sky-400" />
+                )}
+                <span>{stats.isOutdated ? 'Export datato:' : 'Aggiornato:'}</span>
+                <span className={`font-mono ${stats.isOutdated ? 'text-amber-200 font-semibold' : 'text-slate-300'}`}>
                   {stats.lastUpdatedDisplay}
+                  {stats.isOutdated && ` (${stats.daysSinceUpdate}gg fa)`}
                 </span>
               </div>
             </div>
           )}
         </div>
+
+        {/* 7-Day Outdated Warning Banner */}
+        {stats && stats.isOutdated && (
+          <div className="my-2.5 p-3 rounded-xl bg-gradient-to-r from-amber-950/40 via-amber-900/20 to-slate-900/40 border border-amber-500/30 flex items-center justify-between text-xs text-amber-200 shadow-md">
+            <div className="flex items-center gap-2.5">
+              <div className="p-1 rounded-lg bg-amber-500/20 text-amber-400 shrink-0">
+                <AlertTriangle className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="font-bold text-amber-300">Dati catalogo non aggiornati da oltre 7 giorni ({stats.daysSinceUpdate} giorni fa - {stats.lastUpdatedDisplay}): </span>
+                <span className="text-slate-300">Esegui lo script <code className="px-1.5 py-0.5 rounded bg-black/40 font-mono text-amber-300 text-[11px]">export_plex.py</code> sul server Plex per sincronizzare gli ultimi metadati.</span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Section Tabs Quick Selector */}
         {stats && (
