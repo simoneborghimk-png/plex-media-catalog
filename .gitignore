@@ -29,3 +29,22 @@ pnpm-debug.log*
 *.sln
 *.sw?
 .DS_Store
+
+# Local extraction & maintenance scripts (contains local paths and private server logic)
+scripts/
+
+# Local AI agent configurations & rules
+.agents/
+
+# CSV exports (not required by web app, only catalog_data.json is loaded)
+data/*.csv
+*.csv
+
+# Python runtime & local cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.db
+*.sqlite
+.venv/
+venv/
