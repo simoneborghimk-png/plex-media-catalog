@@ -1,7 +1,11 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import path from 'path';
-import fs from 'fs';
+import path from 'node:path';
+import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default defineConfig(({ command }) => {
   const isBuild = command === 'build';
@@ -14,7 +18,7 @@ export default defineConfig(({ command }) => {
       {
         name: 'serve-data-directory',
         configureServer(server) {
-          server.middlewares.use((req, res, next) => {
+          server.middlewares.use((req: any, res: any, next: any) => {
             if (req.url && req.url.includes('/data/')) {
               const urlParts = req.url.split('/data/');
               const relativePath = 'data/' + decodeURIComponent(urlParts[1].split('?')[0]);
