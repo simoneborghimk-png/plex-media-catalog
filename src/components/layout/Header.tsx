@@ -28,8 +28,8 @@ export const Header: React.FC<HeaderProps> = ({
   const isAllSelected = activeSections.length === 0;
 
   return (
-    <header className="sticky top-0 z-30 border-b border-white/[0.08] bg-[#0a0d14]/90 backdrop-blur-md">
-      <div className="max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-30 border-b border-white/[0.08] bg-[#0a0d14]/90 backdrop-blur-md shrink-0">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         {/* Top Branding & Main Meta */}
         <div className="flex flex-col md:flex-row md:items-center justify-between py-3.5 gap-4 border-b border-white/[0.05]">
           <div className="flex items-center gap-3.5">

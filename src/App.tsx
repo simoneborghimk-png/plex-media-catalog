@@ -15,6 +15,7 @@ export const App: React.FC = () => {
   const { items, stats, isLoading, error, loadingStep } = useCatalogData();
   const [selectedItem, setSelectedItem] = useState<UnifiedMediaItem | null>(null);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
 
   const {
     filters,
@@ -96,7 +97,7 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0d14] text-slate-100 flex flex-col">
+    <div className="h-screen w-screen overflow-hidden bg-[#0a0d14] text-slate-100 flex flex-col">
       {/* Top Header & Quick Section Toggles */}
       <Header
         stats={stats}
@@ -105,9 +106,9 @@ export const App: React.FC = () => {
         onSelectAllSections={setAllSections}
       />
 
-      {/* Main Body Layout: Sidebar + Media View */}
-      <div className="flex-1 max-w-[1720px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex gap-6">
-        {/* Filter Sidebar */}
+      {/* Main Split-Pane Body: Sidebar (flush left) + Media View (independent scroll) */}
+      <div className="flex-1 flex w-full min-h-0 overflow-hidden relative">
+        {/* Filter Sidebar - Attached flush to the left */}
         <FilterSidebar
           filters={filters}
           facetCounts={facetCounts}
@@ -126,50 +127,56 @@ export const App: React.FC = () => {
           onToggleAudioCodec={toggleAudioCodec}
           onYearRangeChange={setYearRange}
           onResetFilters={resetFilters}
+          isDesktopOpen={isDesktopSidebarOpen}
+          onToggleDesktop={() => setIsDesktopSidebarOpen(!isDesktopSidebarOpen)}
           isMobileOpen={isMobileFilterOpen}
           onCloseMobile={() => setIsMobileFilterOpen(false)}
         />
 
-        {/* Media Content Area */}
-        <main className="flex-1 min-w-0">
-          {/* View Toolbar: Sort, Per Page, Grid/Table Switcher */}
-          <ViewToggle
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-            sortBy={filters.sortBy}
-            sortDirection={filters.sortDirection}
-            onSortChange={setSort}
-            itemsPerPage={filters.itemsPerPage}
-            onItemsPerPageChange={setItemsPerPage}
-            totalFilteredCount={totalFilteredCount}
-            onOpenMobileFilters={() => setIsMobileFilterOpen(true)}
-            isFiltered={isFiltered}
-          />
-
-          {/* Grid or Table Display */}
-          {viewMode === 'grid' ? (
-            <MediaGrid
-              items={paginatedItems}
-              currentPage={filters.page}
-              totalPages={totalPages}
-              totalFilteredCount={totalFilteredCount}
-              onPageChange={setPage}
-              onSelectItem={setSelectedItem}
-              onResetFilters={resetFilters}
-            />
-          ) : (
-            <MediaTable
-              items={paginatedItems}
+        {/* Media Content Area - Independent Scroll based on hover */}
+        <main className="flex-1 min-w-0 h-full overflow-y-auto overscroll-contain px-4 sm:px-6 lg:px-8 py-6">
+          <div className="max-w-[1720px] mx-auto">
+            {/* View Toolbar: Sort, Per Page, Grid/Table Switcher */}
+            <ViewToggle
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
               sortBy={filters.sortBy}
               sortDirection={filters.sortDirection}
               onSortChange={setSort}
-              currentPage={filters.page}
-              totalPages={totalPages}
+              itemsPerPage={filters.itemsPerPage}
+              onItemsPerPageChange={setItemsPerPage}
               totalFilteredCount={totalFilteredCount}
-              onPageChange={setPage}
-              onSelectItem={setSelectedItem}
+              onOpenMobileFilters={() => setIsMobileFilterOpen(true)}
+              isDesktopSidebarOpen={isDesktopSidebarOpen}
+              onToggleDesktopSidebar={() => setIsDesktopSidebarOpen(!isDesktopSidebarOpen)}
+              isFiltered={isFiltered}
             />
-          )}
+
+            {/* Grid or Table Display */}
+            {viewMode === 'grid' ? (
+              <MediaGrid
+                items={paginatedItems}
+                currentPage={filters.page}
+                totalPages={totalPages}
+                totalFilteredCount={totalFilteredCount}
+                onPageChange={setPage}
+                onSelectItem={setSelectedItem}
+                onResetFilters={resetFilters}
+              />
+            ) : (
+              <MediaTable
+                items={paginatedItems}
+                sortBy={filters.sortBy}
+                sortDirection={filters.sortDirection}
+                onSortChange={setSort}
+                currentPage={filters.page}
+                totalPages={totalPages}
+                totalFilteredCount={totalFilteredCount}
+                onPageChange={setPage}
+                onSelectItem={setSelectedItem}
+              />
+            )}
+          </div>
         </main>
       </div>
 

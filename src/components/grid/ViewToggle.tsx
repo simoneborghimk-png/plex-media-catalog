@@ -5,7 +5,8 @@ import {
   ArrowUpDown,
   SlidersHorizontal,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  PanelLeftOpen
 } from 'lucide-react';
 import { SortField, SortDirection, ViewMode } from '../../types/catalog';
 
@@ -19,6 +20,8 @@ interface ViewToggleProps {
   onItemsPerPageChange: (count: number) => void;
   totalFilteredCount: number;
   onOpenMobileFilters: () => void;
+  isDesktopSidebarOpen?: boolean;
+  onToggleDesktopSidebar?: () => void;
   isFiltered: boolean;
 }
 
@@ -32,12 +35,15 @@ export const ViewToggle: React.FC<ViewToggleProps> = ({
   onItemsPerPageChange,
   totalFilteredCount,
   onOpenMobileFilters,
+  isDesktopSidebarOpen = true,
+  onToggleDesktopSidebar,
   isFiltered
 }) => {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 pb-4 mb-4 border-b border-white/[0.06]">
-      {/* Mobile Filter Button & Results Info */}
+      {/* Mobile / Desktop Filter Buttons & Results Info */}
       <div className="flex items-center gap-3">
+        {/* Mobile Filter Button */}
         <button
           onClick={onOpenMobileFilters}
           className={`lg:hidden flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
@@ -52,6 +58,24 @@ export const ViewToggle: React.FC<ViewToggleProps> = ({
             <span className="w-2 h-2 rounded-full bg-amber-400"></span>
           )}
         </button>
+
+        {/* Desktop Expand Filter Button (shown when sidebar is collapsed) */}
+        {!isDesktopSidebarOpen && onToggleDesktopSidebar && (
+          <button
+            onClick={onToggleDesktopSidebar}
+            className={`hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all shadow-sm ${
+              isFiltered
+                ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-[0_0_10px_rgba(229,160,13,0.2)]'
+                : 'bg-slate-900/90 hover:bg-slate-800 border-white/[0.1] text-slate-300 hover:text-white'
+            }`}
+          >
+            <PanelLeftOpen className="w-3.5 h-3.5 text-amber-400" />
+            <span>Mostra Filtri</span>
+            {isFiltered && (
+              <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+            )}
+          </button>
+        )}
 
         <div className="text-xs text-slate-400">
           Trovati <span className="font-mono font-bold text-white">{totalFilteredCount}</span> elementi

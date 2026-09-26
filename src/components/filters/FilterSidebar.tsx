@@ -14,7 +14,8 @@ import {
   ChevronUp,
   Clapperboard,
   User,
-  Users
+  Users,
+  PanelLeftClose
 } from 'lucide-react';
 import { FilterState } from '../../types/catalog';
 
@@ -43,6 +44,8 @@ interface FilterSidebarProps {
   onToggleAudioCodec: (codec: string) => void;
   onYearRangeChange: (min: number, max: number) => void;
   onResetFilters: () => void;
+  isDesktopOpen?: boolean;
+  onToggleDesktop?: () => void;
   isMobileOpen: boolean;
   onCloseMobile: () => void;
 }
@@ -69,6 +72,8 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   onToggleAudioCodec,
   onYearRangeChange,
   onResetFilters,
+  isDesktopOpen = true,
+  onToggleDesktop,
   isMobileOpen,
   onCloseMobile
 }) => {
@@ -129,26 +134,8 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
     return showAllActors || actorSearch.trim() ? list : list.slice(0, 8);
   }, [sortedActors, actorSearch, showAllActors]);
 
-  const content = (
+  const filterBody = (
     <div className="flex flex-col gap-6 p-4 sm:p-5">
-      {/* Header & Reset */}
-      <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
-        <div className="flex items-center gap-2">
-          <SlidersHorizontal className="w-4 h-4 text-amber-400" />
-          <h2 className="text-sm font-bold text-white uppercase tracking-wider">
-            Filtri Catalogo
-          </h2>
-        </div>
-        {isFiltered && (
-          <button
-            onClick={onResetFilters}
-            className="flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300 font-medium transition-colors"
-          >
-            <RotateCcw className="w-3 h-3" />
-            <span>Reimposta</span>
-          </button>
-        )}
-      </div>
 
       {/* Search Input */}
       <div className="space-y-1.5">
@@ -666,9 +653,47 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
   return (
     <>
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:block w-72 shrink-0 bg-[#0f141f]/95 border-r border-white/[0.08] min-h-[calc(100vh-120px)] sticky top-[105px] h-[calc(100vh-105px)] overflow-y-auto no-scrollbar">
-        {content}
+      {/* Desktop Sidebar - Attached flush to the left of the screen */}
+      <aside
+        className={`hidden lg:flex flex-col shrink-0 bg-[#0c1018] border-r border-white/[0.08] h-full transition-all duration-300 ${
+          isDesktopOpen ? 'w-80' : 'w-0 border-r-0'
+        } overflow-hidden`}
+      >
+        {/* Sticky Sidebar Header */}
+        <div className="p-4 border-b border-white/[0.08] flex items-center justify-between shrink-0 bg-[#0f1422]/90 backdrop-blur-sm">
+          <div className="flex items-center gap-2">
+            <SlidersHorizontal className="w-4 h-4 text-amber-400" />
+            <h2 className="text-sm font-bold text-white uppercase tracking-wider">
+              Filtri Catalogo
+            </h2>
+          </div>
+          <div className="flex items-center gap-2">
+            {isFiltered && (
+              <button
+                onClick={onResetFilters}
+                className="flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300 font-medium transition-colors"
+                title="Reimposta tutti i filtri"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>Reimposta</span>
+              </button>
+            )}
+            {onToggleDesktop && (
+              <button
+                onClick={onToggleDesktop}
+                className="p-1 rounded text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors"
+                title="Comprimi barra laterale filtri"
+              >
+                <PanelLeftClose className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Scrollable Filters Content - independent hover scroll */}
+        <div className="flex-1 overflow-y-auto overscroll-contain flex flex-col">
+          {filterBody}
+        </div>
       </aside>
 
       {/* Mobile Drawer Overlay */}
@@ -678,17 +703,30 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
             className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
             onClick={onCloseMobile}
           />
-          <div className="relative ml-auto w-full max-w-xs bg-[#0f141f] border-l border-white/[0.1] h-full overflow-y-auto shadow-2xl flex flex-col">
-            <div className="flex items-center justify-between p-4 border-b border-white/[0.08]">
-              <span className="font-bold text-white text-sm">Filtri</span>
-              <button
-                onClick={onCloseMobile}
-                className="p-1 rounded-lg text-slate-400 hover:text-white"
-              >
-                <X className="w-5 h-5" />
-              </button>
+          <div className="relative ml-auto w-full max-w-xs bg-[#0f141f] border-l border-white/[0.1] h-full shadow-2xl flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b border-white/[0.08] shrink-0 bg-[#0f1422]">
+              <span className="font-bold text-white text-sm">Filtri Catalogo</span>
+              <div className="flex items-center gap-2">
+                {isFiltered && (
+                  <button
+                    onClick={onResetFilters}
+                    className="flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300 font-medium transition-colors"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                    <span>Reimposta</span>
+                  </button>
+                )}
+                <button
+                  onClick={onCloseMobile}
+                  className="p-1 rounded-lg text-slate-400 hover:text-white"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
-            {content}
+            <div className="flex-1 overflow-y-auto overscroll-contain">
+              {filterBody}
+            </div>
           </div>
         </div>
       )}
