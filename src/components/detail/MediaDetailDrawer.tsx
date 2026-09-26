@@ -10,7 +10,10 @@ import {
   Monitor,
   Volume2,
   FileText,
-  FolderOpen
+  FolderOpen,
+  User,
+  Users,
+  Clapperboard
 } from 'lucide-react';
 import { UnifiedMediaItem } from '../../types/catalog';
 import { ResolutionBadge, SectionBadge, CodecBadge } from '../common/Badge';
@@ -26,9 +29,16 @@ import { copyToClipboard } from '../../utils/copyToClipboard';
 interface MediaDetailDrawerProps {
   item: UnifiedMediaItem | null;
   onClose: () => void;
+  onFilterByDirector?: (director: string) => void;
+  onFilterByActor?: (actor: string) => void;
 }
 
-export const MediaDetailDrawer: React.FC<MediaDetailDrawerProps> = ({ item, onClose }) => {
+export const MediaDetailDrawer: React.FC<MediaDetailDrawerProps> = ({
+  item,
+  onClose,
+  onFilterByDirector,
+  onFilterByActor
+}) => {
   const [copied, setCopied] = useState(false);
 
   // Close on Escape key
@@ -162,6 +172,99 @@ export const MediaDetailDrawer: React.FC<MediaDetailDrawerProps> = ({ item, onCl
                 </p>
               </div>
             )}
+
+            {/* Regia & Cast Principale */}
+            <div className="bg-[#141a29]/90 border border-white/[0.08] rounded-xl p-4 sm:p-5 space-y-4">
+              <div className="flex items-center justify-between border-b border-white/[0.06] pb-2.5">
+                <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                  <Clapperboard className="w-4 h-4 text-amber-400" />
+                  Regia & Cast Principale
+                </h4>
+                <span className="text-[11px] text-slate-400 font-mono">
+                  Primi 5 attori in ordine di importanza
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Director Card */}
+                <div className="md:col-span-1 space-y-1.5">
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <Film className="w-3.5 h-3.5 text-amber-400" />
+                    Regista
+                  </span>
+                  {item.regista ? (
+                    <div className="flex items-center gap-2">
+                      {onFilterByDirector ? (
+                        <button
+                          onClick={() => {
+                            onFilterByDirector(item.regista);
+                            onClose();
+                          }}
+                          title={`Filtra per regista: ${item.regista}`}
+                          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 hover:text-amber-200 border border-amber-500/30 text-sm font-semibold transition-all group shadow-sm text-left"
+                        >
+                          <User className="w-3.5 h-3.5 text-amber-400 group-hover:scale-110 transition-transform shrink-0" />
+                          <span className="truncate">{item.regista}</span>
+                        </button>
+                      ) : (
+                        <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-300 border border-amber-500/20 text-sm font-semibold">
+                          <User className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                          <span>{item.regista}</span>
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-slate-400 italic py-1">
+                      Non specificato nel catalogo
+                    </p>
+                  )}
+                </div>
+
+                {/* Actors List */}
+                <div className="md:col-span-2 space-y-1.5">
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <Users className="w-3.5 h-3.5 text-sky-400" />
+                    Attori Principali
+                  </span>
+                  {item.attori && item.attori.length > 0 ? (
+                    <div className="flex flex-wrap gap-2 pt-0.5">
+                      {item.attori.slice(0, 5).map((actor, idx) => (
+                        onFilterByActor ? (
+                          <button
+                            key={actor + idx}
+                            onClick={() => {
+                              onFilterByActor(actor);
+                              onClose();
+                            }}
+                            title={`Filtra catalogo per attore: ${actor}`}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-sky-500/20 text-slate-200 hover:text-sky-300 border border-white/[0.08] hover:border-sky-500/40 text-xs font-medium transition-all group shadow-sm"
+                          >
+                            <span className="w-4 h-4 rounded-full bg-white/[0.08] group-hover:bg-sky-500/30 text-[10px] font-mono font-bold flex items-center justify-center text-slate-400 group-hover:text-sky-200 shrink-0">
+                              {idx + 1}
+                            </span>
+                            <span>{actor}</span>
+                          </button>
+                        ) : (
+                          <span
+                            key={actor + idx}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.05] text-slate-200 border border-white/[0.08] text-xs font-medium"
+                          >
+                            <span className="w-4 h-4 rounded-full bg-white/[0.08] text-[10px] font-mono font-bold flex items-center justify-center text-slate-400 shrink-0">
+                              {idx + 1}
+                            </span>
+                            <span>{actor}</span>
+                          </span>
+                        )
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-slate-400 italic py-1">
+                      Dati sul cast non specificati nel catalogo
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
 
             {/* Technical Specifications Panel */}
             <div className="space-y-3">

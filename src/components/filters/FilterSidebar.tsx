@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Search,
   X,
@@ -11,7 +11,10 @@ import {
   Video,
   Volume2,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Clapperboard,
+  User,
+  Users
 } from 'lucide-react';
 import { FilterState } from '../../types/catalog';
 import { AVAILABLE_GENRES } from '../../utils/genreClassifier';
@@ -21,6 +24,8 @@ interface FilterSidebarProps {
   facetCounts: {
     genres: Record<string, number>;
     resolutions: Record<string, number>;
+    directors: Record<string, number>;
+    actors: Record<string, number>;
     videoCodecs: Record<string, number>;
     audioCodecs: Record<string, number>;
   };
@@ -31,6 +36,10 @@ interface FilterSidebarProps {
   onToggleResolution: (res: string) => void;
   onToggleGenre: (genre: string) => void;
   onClearGenres: () => void;
+  onToggleDirector: (director: string) => void;
+  onClearDirectors: () => void;
+  onToggleActor: (actor: string) => void;
+  onClearActors: () => void;
   onToggleVideoCodec: (codec: string) => void;
   onToggleAudioCodec: (codec: string) => void;
   onYearRangeChange: (min: number, max: number) => void;
@@ -53,6 +62,10 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   onToggleResolution,
   onToggleGenre,
   onClearGenres,
+  onToggleDirector,
+  onClearDirectors,
+  onToggleActor,
+  onClearActors,
   onToggleVideoCodec,
   onToggleAudioCodec,
   onYearRangeChange,
@@ -62,8 +75,46 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
 }) => {
   const [showAllGenres, setShowAllGenres] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [directorSearch, setDirectorSearch] = useState('');
+  const [showAllDirectors, setShowAllDirectors] = useState(false);
+  const [actorSearch, setActorSearch] = useState('');
+  const [showAllActors, setShowAllActors] = useState(false);
 
   const displayedGenres = showAllGenres ? AVAILABLE_GENRES : AVAILABLE_GENRES.slice(0, 8);
+
+  // Sorted list of directors by count descending
+  const sortedDirectors = useMemo(() => {
+    return Object.entries(facetCounts.directors || {})
+      .filter(([d]) => d && d.trim().length > 0)
+      .sort((a, b) => b[1] - a[1]);
+  }, [facetCounts.directors]);
+
+  // Filtered directors matching directorSearch
+  const displayedDirectors = useMemo(() => {
+    let list = sortedDirectors;
+    if (directorSearch.trim()) {
+      const q = directorSearch.trim().toLowerCase();
+      list = list.filter(([d]) => d.toLowerCase().includes(q));
+    }
+    return showAllDirectors || directorSearch.trim() ? list : list.slice(0, 8);
+  }, [sortedDirectors, directorSearch, showAllDirectors]);
+
+  // Sorted list of actors by count descending
+  const sortedActors = useMemo(() => {
+    return Object.entries(facetCounts.actors || {})
+      .filter(([a]) => a && a.trim().length > 0)
+      .sort((a, b) => b[1] - a[1]);
+  }, [facetCounts.actors]);
+
+  // Filtered actors matching actorSearch
+  const displayedActors = useMemo(() => {
+    let list = sortedActors;
+    if (actorSearch.trim()) {
+      const q = actorSearch.trim().toLowerCase();
+      list = list.filter(([a]) => a.toLowerCase().includes(q));
+    }
+    return showAllActors || actorSearch.trim() ? list : list.slice(0, 8);
+  }, [sortedActors, actorSearch, showAllActors]);
 
   const content = (
     <div className="flex flex-col gap-6 p-4 sm:p-5">
@@ -254,6 +305,224 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
             </>
           )}
         </button>
+      </div>
+
+      {/* Director Filter */}
+      <div className="space-y-2 pt-2 border-t border-white/[0.08]">
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+            <Clapperboard className="w-3.5 h-3.5 text-amber-400" />
+            Regia / Regista
+          </label>
+          {filters.directors.length > 0 && (
+            <button
+              onClick={onClearDirectors}
+              className="text-[11px] text-slate-400 hover:text-amber-400"
+            >
+              Deseleziona ({filters.directors.length})
+            </button>
+          )}
+        </div>
+
+        {/* Selected Directors Chips */}
+        {filters.directors.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 pb-1">
+            {filters.directors.map((d) => (
+              <span
+                key={d}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/50 text-xs font-medium"
+              >
+                <span className="truncate max-w-[130px]">{d}</span>
+                <button
+                  onClick={() => onToggleDirector(d)}
+                  className="hover:text-white ml-0.5"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Search input for directors */}
+        {sortedDirectors.length > 5 && (
+          <div className="relative">
+            <input
+              type="text"
+              value={directorSearch}
+              onChange={(e) => setDirectorSearch(e.target.value)}
+              placeholder="Filtra registi..."
+              className="w-full pl-7 pr-6 py-1 bg-slate-900/70 border border-white/[0.08] rounded-md text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
+            />
+            <Search className="w-3 h-3 text-slate-500 absolute left-2 top-2" />
+            {directorSearch && (
+              <button
+                onClick={() => setDirectorSearch('')}
+                className="absolute right-1.5 top-1.5 text-slate-400 hover:text-white"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Directors List */}
+        {sortedDirectors.length > 0 ? (
+          <>
+            <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto pr-1 no-scrollbar">
+              {displayedDirectors.map(([director, count]) => {
+                const isSelected = filters.directors.includes(director);
+
+                return (
+                  <button
+                    key={director}
+                    onClick={() => onToggleDirector(director)}
+                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium border transition-all ${
+                      isSelected
+                        ? 'bg-amber-500/20 text-amber-300 border-amber-500/60 shadow-[0_0_8px_rgba(229,160,13,0.2)]'
+                        : 'bg-slate-900/60 text-slate-400 border-white/[0.06] hover:bg-slate-800/80 hover:text-slate-200'
+                    }`}
+                  >
+                    <span className="truncate max-w-[150px]">{director}</span>
+                    <span className="text-[10px] font-mono text-slate-400">
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {!directorSearch && sortedDirectors.length > 8 && (
+              <button
+                onClick={() => setShowAllDirectors(!showAllDirectors)}
+                className="text-xs text-amber-400/80 hover:text-amber-300 flex items-center gap-1 pt-0.5"
+              >
+                {showAllDirectors ? (
+                  <>
+                    <ChevronUp className="w-3 h-3" /> Mostra meno registi
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="w-3 h-3" /> Mostra tutti i registi ({sortedDirectors.length})
+                  </>
+                )}
+              </button>
+            )}
+          </>
+        ) : (
+          <p className="text-xs text-slate-500 italic py-0.5">
+            Nessun metadato registi nel catalogo
+          </p>
+        )}
+      </div>
+
+      {/* Actor Filter */}
+      <div className="space-y-2 pt-2 border-t border-white/[0.08]">
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+            <Users className="w-3.5 h-3.5 text-sky-400" />
+            Attori Principali
+          </label>
+          {filters.actors.length > 0 && (
+            <button
+              onClick={onClearActors}
+              className="text-[11px] text-slate-400 hover:text-sky-400"
+            >
+              Deseleziona ({filters.actors.length})
+            </button>
+          )}
+        </div>
+
+        {/* Selected Actors Chips */}
+        {filters.actors.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 pb-1">
+            {filters.actors.map((a) => (
+              <span
+                key={a}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-300 border border-sky-500/50 text-xs font-medium"
+              >
+                <span className="truncate max-w-[130px]">{a}</span>
+                <button
+                  onClick={() => onToggleActor(a)}
+                  className="hover:text-white ml-0.5"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Search input for actors */}
+        {sortedActors.length > 5 && (
+          <div className="relative">
+            <input
+              type="text"
+              value={actorSearch}
+              onChange={(e) => setActorSearch(e.target.value)}
+              placeholder="Filtra attori..."
+              className="w-full pl-7 pr-6 py-1 bg-slate-900/70 border border-white/[0.08] rounded-md text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+            />
+            <Search className="w-3 h-3 text-slate-500 absolute left-2 top-2" />
+            {actorSearch && (
+              <button
+                onClick={() => setActorSearch('')}
+                className="absolute right-1.5 top-1.5 text-slate-400 hover:text-white"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Actors List */}
+        {sortedActors.length > 0 ? (
+          <>
+            <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto pr-1 no-scrollbar">
+              {displayedActors.map(([actor, count]) => {
+                const isSelected = filters.actors.includes(actor);
+
+                return (
+                  <button
+                    key={actor}
+                    onClick={() => onToggleActor(actor)}
+                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium border transition-all ${
+                      isSelected
+                        ? 'bg-sky-500/20 text-sky-300 border-sky-500/60 shadow-[0_0_8px_rgba(56,189,248,0.2)]'
+                        : 'bg-slate-900/60 text-slate-400 border-white/[0.06] hover:bg-slate-800/80 hover:text-slate-200'
+                    }`}
+                  >
+                    <span className="truncate max-w-[150px]">{actor}</span>
+                    <span className="text-[10px] font-mono text-slate-400">
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {!actorSearch && sortedActors.length > 8 && (
+              <button
+                onClick={() => setShowAllActors(!showAllActors)}
+                className="text-xs text-sky-400/80 hover:text-sky-300 flex items-center gap-1 pt-0.5"
+              >
+                {showAllActors ? (
+                  <>
+                    <ChevronUp className="w-3 h-3" /> Mostra meno attori
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="w-3 h-3" /> Mostra tutti gli attori ({sortedActors.length})
+                  </>
+                )}
+              </button>
+            )}
+          </>
+        ) : (
+          <p className="text-xs text-slate-500 italic py-0.5">
+            Nessun metadato attori nel catalogo
+          </p>
+        )}
       </div>
 
       {/* Advanced Codec Filters Toggle */}

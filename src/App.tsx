@@ -30,6 +30,10 @@ export const App: React.FC = () => {
     toggleGenre,
     clearGenres,
     toggleResolution,
+    toggleDirector,
+    clearDirectors,
+    toggleActor,
+    clearActors,
     toggleVideoCodec,
     toggleAudioCodec,
     setYearRange,
@@ -114,6 +118,10 @@ export const App: React.FC = () => {
           onToggleResolution={toggleResolution}
           onToggleGenre={toggleGenre}
           onClearGenres={clearGenres}
+          onToggleDirector={toggleDirector}
+          onClearDirectors={clearDirectors}
+          onToggleActor={toggleActor}
+          onClearActors={clearActors}
           onToggleVideoCodec={toggleVideoCodec}
           onToggleAudioCodec={toggleAudioCodec}
           onYearRangeChange={setYearRange}
@@ -169,6 +177,8 @@ export const App: React.FC = () => {
       <MediaDetailDrawer
         item={selectedItem}
         onClose={() => setSelectedItem(null)}
+        onFilterByDirector={toggleDirector}
+        onFilterByActor={toggleActor}
       />
 
       {/* Footer */}

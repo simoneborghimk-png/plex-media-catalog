@@ -24,6 +24,8 @@ export interface UseCatalogFilterResult {
     sections: Record<MediaSection, number>;
     genres: Record<string, number>;
     resolutions: Record<string, number>;
+    directors: Record<string, number>;
+    actors: Record<string, number>;
     videoCodecs: Record<string, number>;
     audioCodecs: Record<string, number>;
   };
@@ -34,6 +36,10 @@ export interface UseCatalogFilterResult {
   toggleGenre: (genre: string) => void;
   clearGenres: () => void;
   toggleResolution: (res: string) => void;
+  toggleDirector: (director: string) => void;
+  clearDirectors: () => void;
+  toggleActor: (actor: string) => void;
+  clearActors: () => void;
   toggleVideoCodec: (codec: string) => void;
   toggleAudioCodec: (codec: string) => void;
   setYearRange: (min: number, max: number) => void;
@@ -52,6 +58,8 @@ export function useCatalogFilter(items: UnifiedMediaItem[]): UseCatalogFilterRes
     sections: [],
     genres: [],
     resolutions: [],
+    directors: [],
+    actors: [],
     videoCodecs: [],
     audioCodecs: [],
     yearMin: DEFAULT_YEAR_MIN,
@@ -74,6 +82,8 @@ export function useCatalogFilter(items: UnifiedMediaItem[]): UseCatalogFilterRes
     };
     const genreCounts: Record<string, number> = {};
     const resolutionCounts: Record<string, number> = {};
+    const directorCounts: Record<string, number> = {};
+    const actorCounts: Record<string, number> = {};
     const videoCodecCounts: Record<string, number> = {};
     const audioCodecCounts: Record<string, number> = {};
 
@@ -86,6 +96,20 @@ export function useCatalogFilter(items: UnifiedMediaItem[]): UseCatalogFilterRes
       // Genre counts
       item.generi.forEach((g) => {
         genreCounts[g] = (genreCounts[g] || 0) + 1;
+      });
+
+      // Director count
+      if (item.regista && item.regista.trim()) {
+        const d = item.regista.trim();
+        directorCounts[d] = (directorCounts[d] || 0) + 1;
+      }
+
+      // Actor counts (top 5)
+      item.attori.forEach((a) => {
+        const act = a?.trim();
+        if (act) {
+          actorCounts[act] = (actorCounts[act] || 0) + 1;
+        }
       });
 
       // Resolution tier count
@@ -108,6 +132,8 @@ export function useCatalogFilter(items: UnifiedMediaItem[]): UseCatalogFilterRes
       sections: sectionCounts,
       genres: genreCounts,
       resolutions: resolutionCounts,
+      directors: directorCounts,
+      actors: actorCounts,
       videoCodecs: videoCodecCounts,
       audioCodecs: audioCodecCounts
     };
@@ -149,21 +175,36 @@ export function useCatalogFilter(items: UnifiedMediaItem[]): UseCatalogFilterRes
         if (!matchesResolution) return false;
       }
 
-      // 5. Year Range
+      // 5. Director Filter
+      if (filters.directors.length > 0) {
+        if (!item.regista || !filters.directors.includes(item.regista.trim())) {
+          return false;
+        }
+      }
+
+      // 6. Actor Filter
+      if (filters.actors.length > 0) {
+        const hasMatchingActor = filters.actors.some((act) => item.attori.includes(act));
+        if (!hasMatchingActor) {
+          return false;
+        }
+      }
+
+      // 7. Year Range
       if (item.anno !== null && item.anno !== undefined) {
         if (item.anno < filters.yearMin || item.anno > filters.yearMax) {
           return false;
         }
       }
 
-      // 6. Video Codec
+      // 8. Video Codec
       if (filters.videoCodecs.length > 0) {
         if (!filters.videoCodecs.includes(item.codec_video?.toUpperCase())) {
           return false;
         }
       }
 
-      // 7. Audio Codec
+      // 9. Audio Codec
       if (filters.audioCodecs.length > 0) {
         if (!filters.audioCodecs.includes(item.codec_audio?.toUpperCase())) {
           return false;
@@ -172,7 +213,7 @@ export function useCatalogFilter(items: UnifiedMediaItem[]): UseCatalogFilterRes
 
       return true;
     });
-  }, [items, debouncedSearchQuery, filters.sections, filters.genres, filters.resolutions, filters.yearMin, filters.yearMax, filters.videoCodecs, filters.audioCodecs]);
+  }, [items, debouncedSearchQuery, filters.sections, filters.genres, filters.resolutions, filters.directors, filters.actors, filters.yearMin, filters.yearMax, filters.videoCodecs, filters.audioCodecs]);
 
   // Sort Engine
   const sortedItems = useMemo(() => {
@@ -223,6 +264,8 @@ export function useCatalogFilter(items: UnifiedMediaItem[]): UseCatalogFilterRes
       filters.sections.length > 0 ||
       filters.genres.length > 0 ||
       filters.resolutions.length > 0 ||
+      filters.directors.length > 0 ||
+      filters.actors.length > 0 ||
       filters.videoCodecs.length > 0 ||
       filters.audioCodecs.length > 0 ||
       filters.yearMin > DEFAULT_YEAR_MIN ||
@@ -271,6 +314,34 @@ export function useCatalogFilter(items: UnifiedMediaItem[]): UseCatalogFilterRes
         : [...prev.resolutions, res];
       return { ...prev, resolutions: newResolutions, page: 1 };
     });
+  }, []);
+
+  const toggleDirector = useCallback((director: string) => {
+    setFilters((prev) => {
+      const exists = prev.directors.includes(director);
+      const newDirs = exists
+        ? prev.directors.filter((d) => d !== director)
+        : [...prev.directors, director];
+      return { ...prev, directors: newDirs, page: 1 };
+    });
+  }, []);
+
+  const clearDirectors = useCallback(() => {
+    setFilters((prev) => ({ ...prev, directors: [], page: 1 }));
+  }, []);
+
+  const toggleActor = useCallback((actor: string) => {
+    setFilters((prev) => {
+      const exists = prev.actors.includes(actor);
+      const newActors = exists
+        ? prev.actors.filter((a) => a !== actor)
+        : [...prev.actors, actor];
+      return { ...prev, actors: newActors, page: 1 };
+    });
+  }, []);
+
+  const clearActors = useCallback(() => {
+    setFilters((prev) => ({ ...prev, actors: [], page: 1 }));
   }, []);
 
   const toggleVideoCodec = useCallback((codec: string) => {
@@ -323,6 +394,8 @@ export function useCatalogFilter(items: UnifiedMediaItem[]): UseCatalogFilterRes
       sections: [],
       genres: [],
       resolutions: [],
+      directors: [],
+      actors: [],
       videoCodecs: [],
       audioCodecs: [],
       yearMin: DEFAULT_YEAR_MIN,
@@ -346,6 +419,10 @@ export function useCatalogFilter(items: UnifiedMediaItem[]): UseCatalogFilterRes
     toggleGenre,
     clearGenres,
     toggleResolution,
+    toggleDirector,
+    clearDirectors,
+    toggleActor,
+    clearActors,
     toggleVideoCodec,
     toggleAudioCodec,
     setYearRange,

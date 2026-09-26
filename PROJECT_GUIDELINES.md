@@ -55,6 +55,8 @@ Ogni film possiede direttamente le informazioni del file multimediale corrispond
 | `sottotitoli` | `string` | Elenco stream sottotitoli (es. `"it (SRT), it (VOBSUB), en (PGS)"`) |
 | `dimensione_gb` | `number \| null` | Dimensione occupata sul filesystem in Gigabyte (es. `6.72`) |
 | `file_path` | `string` | Percorso assoluto su volume di storage (es. `"L:\\500.giorni.insieme.2009.mkv"`) |
+| `regista` | `string \| undefined` | Regista dell'opera (es. `"Marc Webb"`, `"Sam Mendes"`, `"Stanley Kubrick"`) |
+| `attori` | `string[] \| undefined` | Primi 5 attori principali in ordine di importanza / billing |
 
 #### B. Record Serie / Anime / Cartoni (`SeriesItem`, `SeasonItem`, `EpisodeItem`)
 Le opere a episodi sono modellate gerarchicamente in `stagioni` ed `episodi`.
@@ -65,6 +67,8 @@ Le opere a episodi sono modellate gerarchicamente in `stagioni` ed `episodi`.
   - `anno`: Anno di inizio trasmissione
   - `trama`: Sinossi generale dell'opera
   - `voto`: Rating serie
+  - `regista`: Regista / Showrunner principale (opzionale)
+  - `attori`: Primi 5 attori principali del cast (opzionale)
   - `stagioni`: Array di `SeasonItem`
 - **`SeasonItem`**:
   - `id`: ID stagione

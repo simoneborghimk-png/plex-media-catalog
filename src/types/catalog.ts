@@ -33,6 +33,8 @@ export interface RawSeriesItem {
   anno: number | null;
   trama: string;
   voto: number | null;
+  regista?: string;
+  attori?: string[];
   stagioni: RawSeasonItem[];
 }
 
@@ -54,6 +56,8 @@ export interface RawFilmItem {
   sottotitoli: string;
   dimensione_gb: number | null;
   file_path: string;
+  regista?: string;
+  attori?: string[];
 }
 
 export interface RawCatalogMetadata {
@@ -81,6 +85,8 @@ export interface UnifiedMediaItem {
   trama: string;
   voto: number | null;
   generi: string[];
+  regista: string;
+  attori: string[];
   
   // Normalized/Aggregated properties
   durata_min: number | null;        // Film: durata / Serie: durata media o primo ep
@@ -125,6 +131,8 @@ export interface FilterState {
   sections: MediaSection[];
   genres: string[];
   resolutions: string[];
+  directors: string[];
+  actors: string[];
   videoCodecs: string[];
   audioCodecs: string[];
   yearMin: number;

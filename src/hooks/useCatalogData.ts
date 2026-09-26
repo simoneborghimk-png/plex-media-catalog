@@ -17,6 +17,32 @@ export interface UseCatalogDataResult {
   loadingStep: string;
 }
 
+function extractDirector(item: any): string {
+  if (typeof item.regista === 'string') return item.regista.trim();
+  if (Array.isArray(item.directors) && item.directors.length > 0) {
+    const d = item.directors[0];
+    return (typeof d === 'string' ? d : d?.tag || d?.name || '').trim();
+  }
+  if (typeof item.director === 'string') return item.director.trim();
+  if (typeof item.director === 'object' && item.director) return (item.director.tag || item.director.name || '').trim();
+  return '';
+}
+
+function extractActors(item: any): string[] {
+  const rawList = Array.isArray(item.attori)
+    ? item.attori
+    : Array.isArray(item.roles)
+    ? item.roles
+    : Array.isArray(item.cast)
+    ? item.cast
+    : [];
+
+  return rawList
+    .slice(0, 5)
+    .map((a: any) => (typeof a === 'string' ? a : a?.tag || a?.name || '').trim())
+    .filter(Boolean);
+}
+
 export function useCatalogData(): UseCatalogDataResult {
   const [items, setItems] = useState<UnifiedMediaItem[]>([]);
   const [stats, setStats] = useState<CatalogStats | null>(null);
@@ -58,11 +84,16 @@ export function useCatalogData(): UseCatalogDataResult {
           totalStorageGb += size;
 
           const genres = classifyGenres(film.titolo, film.trama || '', 'film');
+          const director = extractDirector(film);
+          const actors = extractActors(film);
+
           const tokens = [
             film.titolo,
             film.titolo_originale,
             film.anno?.toString() || '',
             film.trama,
+            director,
+            actors.join(' '),
             film.risoluzione,
             film.codec_video,
             film.codec_audio,
@@ -81,6 +112,8 @@ export function useCatalogData(): UseCatalogDataResult {
             trama: film.trama || '',
             voto: film.voto,
             generi: genres,
+            regista: director,
+            attori: actors,
             durata_min: film.durata_min,
             durata_totale_min: film.durata_min || 0,
             dimensione_gb: size,
@@ -156,11 +189,16 @@ export function useCatalogData(): UseCatalogDataResult {
             totalStorageGb += seriesStorage;
 
             const genres = classifyGenres(series.titolo, series.trama || '', section);
+            const director = extractDirector(series);
+            const actors = extractActors(series);
+
             const tokens = [
               series.titolo,
               series.titolo_originale,
               series.anno?.toString() || '',
               series.trama,
+              director,
+              actors.join(' '),
               primaryResolution,
               primaryCodecVideo,
               primaryCodecAudio,
@@ -179,6 +217,8 @@ export function useCatalogData(): UseCatalogDataResult {
               trama: series.trama || '',
               voto: series.voto,
               generi: genres,
+              regista: director,
+              attori: actors,
               durata_min: episodeCount > 0 ? Math.round(seriesDuration / episodeCount) : 0,
               durata_totale_min: seriesDuration,
               dimensione_gb: Number(seriesStorage.toFixed(2)),

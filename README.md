@@ -30,6 +30,8 @@
 - ⚡ **Instant Full-Text Search**: Sub-millisecond debounced queries across localized titles, original titles, synopses, codecs, and absolute storage paths.
 - 🎛️ **Multi-Dimensional Reactive Filters**:
   - **Media Section**: Instant switching or multi-selection across **Movies (Film)**, **TV Shows (Serie TV)**, **Anime**, and **Cartoons**.
+  - **Director (Regia / Regista)**: Dedicated searchable filter with hit counts and quick-clear toggles to explore works by specific directors.
+  - **Main Cast (Attori Principali)**: Dedicated searchable filter covering the top 5 main actors in order of billing importance.
   - **Video Resolution**: Quick-toggle pills for **4K UHD** (with neon purple glow), **1080p FHD** (sky blue), **720p HD**, and **SD / Other**.
   - **Smart Genre Taxonomy**: Dynamic semantic chip selector based on plot keyword extraction (*Action*, *Sci-Fi*, *Comedy*, *Drama*, *Horror*, *Thriller*, *Adventure*, *Animation*, etc.) with real-time match counters.
   - **Release Year Range**: Dual-handle slider filtering titles from **1930 to 2026**.
@@ -37,13 +39,13 @@
 - 🎴 **Cinematic Grid View**:
   - Generative atmospheric gradient posters tailored to each title.
   - High-contrast badges for resolution profile, release year, duration, and season counts.
-  - Interactive hover state displaying synopsis preview, stream codecs, and one-click file path copier.
+  - Interactive hover state displaying synopsis preview, stream codecs, and detail inspection.
 - 📋 **High-Density Technical Table View**:
-  - Engineered for system administrators, media curators, and storage auditors.
+  - Default high-density view (100 items per page with 25/50/100/200 options) engineered for media curators.
   - Fully sortable columns: **Title**, **Section**, **Year**, **Resolution**, **Video Codec**, **Audio Codec**, **Duration**, and **Storage Size (GB)**.
-  - **Instant 1-Click File Path Copy** with animated feedback toast.
 - 🔬 **Media Detail Drawer & Season/Episode Explorer**:
   - Fluid glassmorphic slide-out modal with backdrop blur and keyboard shortcut navigation (`ESC` to close).
+  - **Regia & Cast Principale**: Dedicated section showcasing the director and top 5 billing actors with interactive 1-click filter chips.
   - Exact technical specifications: width × height resolution, computed aspect ratio (e.g. *16:9*, *2.39:1 Cinemascope*), audio channels (e.g. *5.1 Surround*, *Stereo*), all audio language streams, and subtitle tracks (SRT, PGS, VOBSUB).
   - **Multi-Season & Episode Explorer** for episodic shows: browse season tabs, inspect individual episode synopses, and copy individual video file paths.
 - 🚀 **Zero-Lag Architecture**: In-memory indexing and single-pass normalization handling **2,969 titles** and over **24,670 episodes** at steady 60 FPS.
