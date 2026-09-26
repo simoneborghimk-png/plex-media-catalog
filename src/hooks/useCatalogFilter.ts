@@ -11,7 +11,7 @@ import { useDebounce } from './useDebounce';
 
 const DEFAULT_YEAR_MIN = 1930;
 const DEFAULT_YEAR_MAX = 2026;
-const DEFAULT_ITEMS_PER_PAGE = 36;
+const DEFAULT_ITEMS_PER_PAGE = 100;
 
 export interface UseCatalogFilterResult {
   filters: FilterState;
@@ -45,7 +45,7 @@ export interface UseCatalogFilterResult {
 }
 
 export function useCatalogFilter(items: UnifiedMediaItem[]): UseCatalogFilterResult {
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [viewMode, setViewMode] = useState<ViewMode>('table');
 
   const [filters, setFilters] = useState<FilterState>({
     searchQuery: '',

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Film,
   Tv,
@@ -6,15 +6,12 @@ import {
   Smile,
   Clock,
   HardDrive,
-  Copy,
-  Check,
   Info,
   Layers
 } from 'lucide-react';
 import { UnifiedMediaItem } from '../../types/catalog';
 import { ResolutionBadge, SectionBadge, CodecBadge } from '../common/Badge';
 import { formatDuration, formatStorage } from '../../utils/formatters';
-import { copyToClipboard } from '../../utils/copyToClipboard';
 
 interface MediaCardProps {
   item: UnifiedMediaItem;
@@ -49,18 +46,6 @@ function getCardGradient(id: number, section: string): string {
 }
 
 export const MediaCard: React.FC<MediaCardProps> = ({ item, onSelect }) => {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopyPath = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!item.file_path) return;
-    const ok = await copyToClipboard(item.file_path);
-    if (ok) {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
   const gradient = getCardGradient(item.id, item.section);
   const isSeries = item.section !== 'film';
 
@@ -158,7 +143,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({ item, onSelect }) => {
             </div>
           </div>
 
-          {/* Codecs & Quick Copy Action */}
+          {/* Codecs & Detail Action */}
           <div className="flex items-center justify-between pt-1">
             <div className="flex items-center gap-1 overflow-hidden">
               <CodecBadge codec={item.codec_video} type="video" />
@@ -166,36 +151,16 @@ export const MediaCard: React.FC<MediaCardProps> = ({ item, onSelect }) => {
             </div>
 
             <div className="flex items-center gap-1.5">
-              {item.file_path && (
-                <button
-                  onClick={handleCopyPath}
-                  title="Copia percorso file"
-                  className={`p-1.5 rounded-md border transition-all text-xs flex items-center gap-1 ${
-                    copied
-                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50'
-                      : 'bg-white/[0.03] text-slate-400 hover:text-white hover:bg-white/[0.08] border-white/[0.06]'
-                  }`}
-                >
-                  {copied ? (
-                    <>
-                      <Check className="w-3 h-3 text-emerald-400" />
-                      <span className="text-[10px] font-medium text-emerald-400">Copiato!</span>
-                    </>
-                  ) : (
-                    <Copy className="w-3 h-3" />
-                  )}
-                </button>
-              )}
-
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   onSelect(item);
                 }}
                 title="Dettagli tecnici"
-                className="p-1.5 rounded-md bg-white/[0.03] hover:bg-amber-500/20 text-slate-400 hover:text-amber-400 border border-white/[0.06] hover:border-amber-500/30 transition-all"
+                className="flex items-center gap-1 px-2 py-1 rounded-md bg-white/[0.04] hover:bg-amber-500/20 text-slate-400 hover:text-amber-400 border border-white/[0.06] hover:border-amber-500/30 transition-all text-xs"
               >
                 <Info className="w-3 h-3" />
+                <span className="text-[10px] font-medium">Dettagli</span>
               </button>
             </div>
           </div>

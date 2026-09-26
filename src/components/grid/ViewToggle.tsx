@@ -97,10 +97,10 @@ export const ViewToggle: React.FC<ViewToggleProps> = ({
             onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
             className="bg-transparent text-white font-mono focus:outline-none cursor-pointer"
           >
-            <option value={24} className="bg-slate-900 text-white">24</option>
-            <option value={36} className="bg-slate-900 text-white">36</option>
-            <option value={48} className="bg-slate-900 text-white">48</option>
-            <option value={72} className="bg-slate-900 text-white">72</option>
+            <option value={25} className="bg-slate-900 text-white">25</option>
+            <option value={50} className="bg-slate-900 text-white">50</option>
+            <option value={100} className="bg-slate-900 text-white">100</option>
+            <option value={200} className="bg-slate-900 text-white">200</option>
           </select>
         </div>
 

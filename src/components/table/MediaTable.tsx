@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
-  Copy,
-  Check,
   ChevronLeft,
   ChevronRight,
   ExternalLink
@@ -16,7 +14,6 @@ import {
 } from '../../types/catalog';
 import { ResolutionBadge, SectionBadge, CodecBadge } from '../common/Badge';
 import { formatDuration, formatStorage } from '../../utils/formatters';
-import { copyToClipboard } from '../../utils/copyToClipboard';
 
 interface MediaTableProps {
   items: UnifiedMediaItem[];
@@ -41,18 +38,6 @@ export const MediaTable: React.FC<MediaTableProps> = ({
   onPageChange,
   onSelectItem
 }) => {
-  const [copiedId, setCopiedId] = useState<number | null>(null);
-
-  const handleCopy = async (e: React.MouseEvent, id: number, path: string) => {
-    e.stopPropagation();
-    if (!path) return;
-    const ok = await copyToClipboard(path);
-    if (ok) {
-      setCopiedId(id);
-      setTimeout(() => setCopiedId(null), 2000);
-    }
-  };
-
   const renderSortIndicator = (field: SortField) => {
     if (sortBy !== field) {
       return <ArrowUpDown className="w-3 h-3 text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity ml-1" />;
@@ -110,13 +95,11 @@ export const MediaTable: React.FC<MediaTableProps> = ({
                   {renderSortIndicator('dimensione_gb')}
                 </div>
               </th>
-              <th className="py-3.5 px-4">Percorso File Storage</th>
               <th className="py-3.5 px-3 text-center">Azioni</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/[0.05] text-slate-300">
             {items.map((item) => {
-              const isCopied = copiedId === item.id;
               const isSeries = item.section !== 'film';
 
               return (
@@ -178,42 +161,16 @@ export const MediaTable: React.FC<MediaTableProps> = ({
                     {formatStorage(item.dimensione_gb)}
                   </td>
 
-                  {/* File Path */}
-                  <td className="py-3 px-4 max-w-xs">
-                    <div
-                      className="font-mono text-[11px] text-slate-400 truncate bg-slate-900/60 px-2 py-1 rounded border border-white/[0.05]"
-                      title={item.file_path}
-                    >
-                      {item.file_path || 'N/D'}
-                    </div>
-                  </td>
-
                   {/* Actions */}
                   <td className="py-3 px-3 text-center whitespace-nowrap">
                     <div className="flex items-center justify-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                      {item.file_path && (
-                        <button
-                          onClick={(e) => handleCopy(e, item.id, item.file_path)}
-                          title="Copia percorso file"
-                          className={`p-1.5 rounded-lg border transition-all ${
-                            isCopied
-                              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50'
-                              : 'bg-white/[0.04] text-slate-400 hover:text-white hover:bg-white/[0.08] border-white/[0.06]'
-                          }`}
-                        >
-                          {isCopied ? (
-                            <Check className="w-3.5 h-3.5 text-emerald-400" />
-                          ) : (
-                            <Copy className="w-3.5 h-3.5" />
-                          )}
-                        </button>
-                      )}
                       <button
                         onClick={() => onSelectItem(item)}
                         title="Apri scheda dettagli"
-                        className="p-1.5 rounded-lg bg-white/[0.04] text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 border border-white/[0.06] transition-all"
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white/[0.04] text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 border border-white/[0.06] transition-all text-xs"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
+                        <span className="text-[11px] font-medium">Dettagli</span>
                       </button>
                     </div>
                   </td>
