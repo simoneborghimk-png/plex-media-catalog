@@ -17,7 +17,6 @@ import {
   Users
 } from 'lucide-react';
 import { FilterState } from '../../types/catalog';
-import { AVAILABLE_GENRES } from '../../utils/genreClassifier';
 
 interface FilterSidebarProps {
   filters: FilterState;
@@ -80,7 +79,16 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   const [actorSearch, setActorSearch] = useState('');
   const [showAllActors, setShowAllActors] = useState(false);
 
-  const displayedGenres = showAllGenres ? AVAILABLE_GENRES : AVAILABLE_GENRES.slice(0, 8);
+  // Sorted list of genres by count descending from Plex data
+  const sortedGenres = useMemo(() => {
+    return Object.entries(facetCounts.genres || {})
+      .filter(([g, count]) => g && g.trim().length > 0 && count > 0)
+      .sort((a, b) => b[1] - a[1]);
+  }, [facetCounts.genres]);
+
+  const displayedGenres = useMemo(() => {
+    return showAllGenres ? sortedGenres : sortedGenres.slice(0, 10);
+  }, [sortedGenres, showAllGenres]);
 
   // Sorted list of directors by count descending
   const sortedDirectors = useMemo(() => {
@@ -269,8 +277,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           )}
         </div>
         <div className="flex flex-wrap gap-1.5">
-          {displayedGenres.map((genre) => {
-            const count = facetCounts.genres[genre] || 0;
+          {displayedGenres.map(([genre, count]) => {
             const isSelected = filters.genres.includes(genre);
 
             return (
@@ -291,20 +298,22 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
             );
           })}
         </div>
-        <button
-          onClick={() => setShowAllGenres(!showAllGenres)}
-          className="text-xs text-amber-400/80 hover:text-amber-300 flex items-center gap-1 pt-1"
-        >
-          {showAllGenres ? (
-            <>
-              <ChevronUp className="w-3 h-3" /> Mostra meno generi
-            </>
-          ) : (
-            <>
-              <ChevronDown className="w-3 h-3" /> Mostra tutti i generi ({AVAILABLE_GENRES.length})
-            </>
-          )}
-        </button>
+        {sortedGenres.length > 10 && (
+          <button
+            onClick={() => setShowAllGenres(!showAllGenres)}
+            className="text-xs text-amber-400/80 hover:text-amber-300 flex items-center gap-1 pt-1"
+          >
+            {showAllGenres ? (
+              <>
+                <ChevronUp className="w-3 h-3" /> Mostra meno generi
+              </>
+            ) : (
+              <>
+                <ChevronDown className="w-3 h-3" /> Mostra tutti i generi ({sortedGenres.length})
+              </>
+            )}
+          </button>
+        )}
       </div>
 
       {/* Director Filter */}
