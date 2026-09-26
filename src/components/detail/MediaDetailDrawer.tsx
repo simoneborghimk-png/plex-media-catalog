@@ -266,6 +266,17 @@ export const MediaDetailDrawer: React.FC<MediaDetailDrawerProps> = ({
               </div>
             </div>
 
+            {/* Episodic Explorer for TV Series, Anime, Cartoon */}
+            {isSeries && item.stagioni && item.stagioni.length > 0 && (
+              <div className="space-y-3 pt-2">
+                <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-amber-400" />
+                  Esplora Stagioni ed Episodi ({item.numero_episodi} totali)
+                </h4>
+                <SeasonAccordion seasons={item.stagioni} />
+              </div>
+            )}
+
             {/* Technical Specifications Panel */}
             <div className="space-y-3">
               <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
@@ -360,17 +371,6 @@ export const MediaDetailDrawer: React.FC<MediaDetailDrawerProps> = ({
                     )}
                   </button>
                 </div>
-              </div>
-            )}
-
-            {/* Episodic Explorer for TV Series, Anime, Cartoon */}
-            {isSeries && item.stagioni && item.stagioni.length > 0 && (
-              <div className="space-y-3 pt-4 border-t border-white/[0.08]">
-                <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-amber-400" />
-                  Esplora Stagioni ed Episodi ({item.numero_episodi} totali)
-                </h4>
-                <SeasonAccordion seasons={item.stagioni} />
               </div>
             )}
           </div>

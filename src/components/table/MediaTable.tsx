@@ -4,8 +4,7 @@ import {
   ArrowUp,
   ArrowDown,
   ChevronLeft,
-  ChevronRight,
-  ExternalLink
+  ChevronRight
 } from 'lucide-react';
 import {
   UnifiedMediaItem,
@@ -102,7 +101,6 @@ export const MediaTable: React.FC<MediaTableProps> = ({
                   {renderSortIndicator('dimensione_gb')}
                 </div>
               </th>
-              <th className="py-3.5 px-3 text-center">Azioni</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/[0.05] text-slate-300">
@@ -167,20 +165,6 @@ export const MediaTable: React.FC<MediaTableProps> = ({
                   {/* Storage Size */}
                   <td className="py-3 px-3 font-mono font-semibold text-slate-200 whitespace-nowrap">
                     {formatStorage(item.dimensione_gb)}
-                  </td>
-
-                  {/* Actions */}
-                  <td className="py-3 px-3 text-center whitespace-nowrap">
-                    <div className="flex items-center justify-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                      <button
-                        onClick={() => onSelectItem(item)}
-                        title="Apri scheda dettagli"
-                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white/[0.04] text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 border border-white/[0.06] transition-all text-xs"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                        <span className="text-[11px] font-medium">Dettagli</span>
-                      </button>
-                    </div>
                   </td>
                 </tr>
               );
