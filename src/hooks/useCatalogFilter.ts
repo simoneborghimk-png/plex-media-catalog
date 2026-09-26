@@ -241,6 +241,14 @@ export function useCatalogFilter(items: UnifiedMediaItem[]): UseCatalogFilterRes
         const voteB = b.voto ?? -1;
         return modifier * (voteA - voteB);
       }
+      if (sortBy === 'regista') {
+        const regA = a.regista || '';
+        const regB = b.regista || '';
+        if (!regA && !regB) return 0;
+        if (!regA) return 1;
+        if (!regB) return -1;
+        return modifier * regA.localeCompare(regB, 'it', { sensitivity: 'base' });
+      }
       return 0;
     });
 

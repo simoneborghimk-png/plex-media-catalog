@@ -127,7 +127,7 @@ export interface CatalogStats {
   isOutdated?: boolean;
 }
 
-export type SortField = 'titolo' | 'anno' | 'dimensione_gb' | 'durata_min' | 'voto';
+export type SortField = 'titolo' | 'anno' | 'dimensione_gb' | 'durata_min' | 'voto' | 'regista';
 export type SortDirection = 'asc' | 'desc';
 export type ViewMode = 'grid' | 'table';
 

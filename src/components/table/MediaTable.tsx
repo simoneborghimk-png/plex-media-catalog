@@ -12,7 +12,7 @@ import {
   SortField,
   SortDirection
 } from '../../types/catalog';
-import { ResolutionBadge, SectionBadge, CodecBadge } from '../common/Badge';
+import { ResolutionBadge, SectionBadge } from '../common/Badge';
 import { formatDuration, formatStorage } from '../../utils/formatters';
 
 interface MediaTableProps {
@@ -74,9 +74,16 @@ export const MediaTable: React.FC<MediaTableProps> = ({
                   {renderSortIndicator('anno')}
                 </div>
               </th>
+              <th
+                onClick={() => onSortChange('regista')}
+                className="group py-3.5 px-3 cursor-pointer hover:text-white transition-colors"
+              >
+                <div className="flex items-center">
+                  <span>Regista</span>
+                  {renderSortIndicator('regista')}
+                </div>
+              </th>
               <th className="py-3.5 px-3">Risoluzione</th>
-              <th className="py-3.5 px-3">Video Codec</th>
-              <th className="py-3.5 px-3">Audio Codec</th>
               <th
                 onClick={() => onSortChange('durata_min')}
                 className="group py-3.5 px-3 cursor-pointer hover:text-white transition-colors"
@@ -130,19 +137,20 @@ export const MediaTable: React.FC<MediaTableProps> = ({
                     {item.anno || '—'}
                   </td>
 
+                  {/* Director */}
+                  <td className="py-3 px-3 text-slate-300 max-w-[150px] truncate" title={item.regista || undefined}>
+                    {item.regista ? (
+                      <span className="text-xs text-amber-200/90 font-medium truncate block">
+                        {item.regista}
+                      </span>
+                    ) : (
+                      <span className="text-slate-400 text-xs">—</span>
+                    )}
+                  </td>
+
                   {/* Resolution */}
                   <td className="py-3 px-3 whitespace-nowrap">
                     <ResolutionBadge resolution={item.risoluzione} />
-                  </td>
-
-                  {/* Video Codec */}
-                  <td className="py-3 px-3 whitespace-nowrap">
-                    <CodecBadge codec={item.codec_video} type="video" />
-                  </td>
-
-                  {/* Audio Codec */}
-                  <td className="py-3 px-3 whitespace-nowrap">
-                    <CodecBadge codec={item.codec_audio} type="audio" />
                   </td>
 
                   {/* Duration */}

@@ -79,6 +79,11 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   const [actorSearch, setActorSearch] = useState('');
   const [showAllActors, setShowAllActors] = useState(false);
 
+  const MIN_YEAR = 1930;
+  const MAX_YEAR = 2026;
+  const minPercent = Math.min(100, Math.max(0, Math.round(((filters.yearMin - MIN_YEAR) / (MAX_YEAR - MIN_YEAR)) * 100)));
+  const maxPercent = Math.min(100, Math.max(0, Math.round(((filters.yearMax - MIN_YEAR) / (MAX_YEAR - MIN_YEAR)) * 100)));
+
   // Sorted list of genres by count descending from Plex data
   const sortedGenres = useMemo(() => {
     return Object.entries(facetCounts.genres || {})
@@ -186,76 +191,78 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
         </span>
       </div>
 
-      {/* Resolution Filter */}
-      <div className="space-y-2">
-        <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-          <Monitor className="w-3.5 h-3.5 text-sky-400" />
-          Risoluzione Video
-        </label>
-        <div className="grid grid-cols-2 gap-1.5">
-          {RESOLUTION_OPTIONS.map((res) => {
-            const count = facetCounts.resolutions[res] || 0;
-            const isSelected = filters.resolutions.includes(res);
-
-            return (
-              <button
-                key={res}
-                onClick={() => onToggleResolution(res)}
-                className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                  isSelected
-                    ? 'bg-sky-500/20 text-sky-300 border-sky-500/60 shadow-[0_0_10px_rgba(56,189,248,0.2)]'
-                    : 'bg-slate-900/60 text-slate-400 border-white/[0.06] hover:bg-slate-800/80 hover:text-slate-200'
-                }`}
-              >
-                <span className="truncate">{res}</span>
-                <span className="text-[10px] font-mono text-slate-400 ml-1">
-                  {count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Year Range Filter */}
+      {/* Year Range Filter (Single Dual-Handle Range Slider) */}
       <div className="space-y-2.5">
         <div className="flex items-center justify-between">
           <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
             <Calendar className="w-3.5 h-3.5 text-emerald-400" />
             Anno di Uscita
           </label>
-          <span className="text-xs font-mono font-semibold text-amber-400">
-            {filters.yearMin} – {filters.yearMax}
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-mono font-semibold text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/25">
+              {filters.yearMin} – {filters.yearMax}
+            </span>
+            {(filters.yearMin !== MIN_YEAR || filters.yearMax !== MAX_YEAR) && (
+              <button
+                onClick={() => onYearRangeChange(MIN_YEAR, MAX_YEAR)}
+                className="text-[10px] text-slate-400 hover:text-amber-400 p-0.5 transition-colors"
+                title="Reimposta intervallo anni"
+              >
+                <RotateCcw className="w-3 h-3" />
+              </button>
+            )}
+          </div>
         </div>
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
+
+        {/* Dual-thumb Range Slider */}
+        <div className="pt-2 pb-1 px-1">
+          <div className="relative h-6 flex items-center">
+            {/* Background Track */}
+            <div className="absolute left-0 right-0 h-1.5 bg-slate-800/90 rounded-full border border-white/[0.06]" />
+
+            {/* Active Highlight Track */}
+            <div
+              className="absolute h-1.5 bg-gradient-to-r from-amber-500 to-amber-400 rounded-full shadow-[0_0_8px_rgba(245,158,11,0.4)] pointer-events-none"
+              style={{
+                left: `${minPercent}%`,
+                width: `${Math.max(0, maxPercent - minPercent)}%`
+              }}
+            />
+
+            {/* Min Year Slider */}
             <input
               type="range"
-              min={1930}
-              max={2026}
+              min={MIN_YEAR}
+              max={MAX_YEAR}
               value={filters.yearMin}
               onChange={(e) => {
                 const val = Math.min(Number(e.target.value), filters.yearMax);
                 onYearRangeChange(val, filters.yearMax);
               }}
-              className="w-full accent-amber-500 h-1.5 bg-slate-800 rounded-lg cursor-pointer"
+              className={`absolute inset-0 w-full h-full appearance-none bg-transparent pointer-events-none cursor-pointer ${
+                filters.yearMin > 1990 ? 'z-20' : 'z-10'
+              } [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-400 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-slate-900 [&::-webkit-slider-thumb]:shadow-[0_0_6px_rgba(245,158,11,0.6)] [&::-webkit-slider-thumb]:hover:scale-125 [&::-webkit-slider-thumb]:transition-transform [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-amber-400 [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-slate-900 [&::-moz-range-thumb]:shadow-[0_0_6px_rgba(245,158,11,0.6)]`}
             />
+
+            {/* Max Year Slider */}
             <input
               type="range"
-              min={1930}
-              max={2026}
+              min={MIN_YEAR}
+              max={MAX_YEAR}
               value={filters.yearMax}
               onChange={(e) => {
                 const val = Math.max(Number(e.target.value), filters.yearMin);
                 onYearRangeChange(filters.yearMin, val);
               }}
-              className="w-full accent-amber-500 h-1.5 bg-slate-800 rounded-lg cursor-pointer"
+              className={`absolute inset-0 w-full h-full appearance-none bg-transparent pointer-events-none cursor-pointer ${
+                filters.yearMin > 1990 ? 'z-10' : 'z-20'
+              } [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-400 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-slate-900 [&::-webkit-slider-thumb]:shadow-[0_0_6px_rgba(245,158,11,0.6)] [&::-webkit-slider-thumb]:hover:scale-125 [&::-webkit-slider-thumb]:transition-transform [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-amber-400 [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-slate-900 [&::-moz-range-thumb]:shadow-[0_0_6px_rgba(245,158,11,0.6)]`}
             />
           </div>
-          <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono">
-            <span>1930</span>
-            <span>2026</span>
+
+          <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono mt-1">
+            <span>{MIN_YEAR}</span>
+            <span>{MAX_YEAR}</span>
           </div>
         </div>
       </div>
@@ -532,6 +539,47 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
             Nessun metadato attori nel catalogo
           </p>
         )}
+      </div>
+
+      {/* Resolution Filter */}
+      <div className="space-y-2 pt-2 border-t border-white/[0.08]">
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+            <Monitor className="w-3.5 h-3.5 text-sky-400" />
+            Risoluzione Video
+          </label>
+          {filters.resolutions.length > 0 && (
+            <button
+              onClick={() => filters.resolutions.forEach(r => onToggleResolution(r))}
+              className="text-[11px] text-slate-400 hover:text-amber-400"
+            >
+              Deseleziona
+            </button>
+          )}
+        </div>
+        <div className="grid grid-cols-2 gap-1.5">
+          {RESOLUTION_OPTIONS.map((res) => {
+            const count = facetCounts.resolutions[res] || 0;
+            const isSelected = filters.resolutions.includes(res);
+
+            return (
+              <button
+                key={res}
+                onClick={() => onToggleResolution(res)}
+                className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                  isSelected
+                    ? 'bg-sky-500/20 text-sky-300 border-sky-500/60 shadow-[0_0_10px_rgba(56,189,248,0.2)]'
+                    : 'bg-slate-900/60 text-slate-400 border-white/[0.06] hover:bg-slate-800/80 hover:text-slate-200'
+                }`}
+              >
+                <span className="truncate">{res}</span>
+                <span className="text-[10px] font-mono text-slate-400 ml-1">
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Advanced Codec Filters Toggle */}
