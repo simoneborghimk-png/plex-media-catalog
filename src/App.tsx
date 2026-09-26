@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useCatalogData } from './hooks/useCatalogData';
 import { useCatalogFilter } from './hooks/useCatalogFilter';
 import { Header } from './components/layout/Header';
-import { Footer } from './components/layout/Footer';
 import { FilterSidebar } from './components/filters/FilterSidebar';
 import { ViewToggle } from './components/grid/ViewToggle';
 import { MediaGrid } from './components/grid/MediaGrid';
@@ -187,9 +186,6 @@ export const App: React.FC = () => {
         onFilterByDirector={toggleDirector}
         onFilterByActor={toggleActor}
       />
-
-      {/* Footer */}
-      <Footer stats={stats} />
     </div>
   );
 };
