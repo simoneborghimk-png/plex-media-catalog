@@ -16,7 +16,7 @@ export interface RawEpisodeItem {
   tracce_audio: string;
   sottotitoli: string;
   dimensione_gb: number | null;
-  file_path: string;
+  file_path?: string;
 }
 
 export interface RawSeasonItem {
@@ -56,7 +56,7 @@ export interface RawFilmItem {
   tracce_audio: string;
   sottotitoli: string;
   dimensione_gb: number | null;
-  file_path: string;
+  file_path?: string;
   generi?: string[];
   regista?: string;
   attori?: string[];
@@ -102,7 +102,7 @@ export interface UnifiedMediaItem {
   canali_audio: number | null;
   tracce_audio: string;
   sottotitoli: string;
-  file_path: string;
+  file_path?: string;
   
   // Series specific
   numero_stagioni: number;

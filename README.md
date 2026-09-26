@@ -27,39 +27,46 @@
 
 ## 🌟 Highlights & Key Features
 
-- ⚡ **Instant Full-Text Search**: Sub-millisecond debounced queries across localized titles, original titles, synopses, codecs, and absolute storage paths.
-- 🎛️ **Multi-Dimensional Reactive Filters**:
+- ⚡ **Instant Full-Text Search**: Sub-millisecond debounced queries across localized titles, original titles, synopses, directors, actors, codecs, and absolute storage paths.
+- 🎛️ **Multi-Dimensional Reactive Filters & Fixed Sidebar**:
+  - **Fixed Left Anchor & Hover-Isolated Scrolling**: When expanded, the sidebar is fixed to the left of the viewport with independent hover scroll (scrolling while hovering the sidebar scrolls only the filters; scrolling over the catalog scrolls only the media list).
   - **Media Section**: Instant switching or multi-selection across **Movies (Film)**, **TV Shows (Serie TV)**, **Anime**, and **Cartoons**.
-  - **Director (Regia / Regista)**: Dedicated searchable filter with hit counts and quick-clear toggles to explore works by specific directors.
-  - **Main Cast (Attori Principali)**: Dedicated searchable filter covering the top 5 main actors in order of billing importance.
-  - **Video Resolution**: Quick-toggle pills for **4K UHD** (with neon purple glow), **1080p FHD** (sky blue), **720p HD**, and **SD / Other**.
-  - **Smart Genre Taxonomy**: Dynamic semantic chip selector based on plot keyword extraction (*Action*, *Sci-Fi*, *Comedy*, *Drama*, *Horror*, *Thriller*, *Adventure*, *Animation*, etc.) with real-time match counters.
-  - **Release Year Range**: Dual-handle slider filtering titles from **1930 to 2026**.
+  - **Director (Regia / Regista)**: Searchable filter with hit counts to instantly explore filmographies.
+  - **Main Cast (Attori Principali)**: Searchable filter covering the top 5 main actors in order of billing importance.
+  - **Release Year Range**: Dual-handle range slider to filter titles between start and end years (e.g. **1930 to 2026**).
+  - **Video Resolution**: Quick-toggle pills for **4K UHD** (with neon purple glow), **1080p FHD** (sky blue), **720p HD**, and **SD / Other**, placed conveniently right above the codec specifications.
   - **Advanced Codec Filters**: Drill down by video compression (*HEVC/H.265*, *AVC/H.264*, *VC-1*, *MPEG4*) and audio stream formats (*DTS/DCA*, *AC3*, *EAC3*, *FLAC*, *TrueHD*, *AAC*).
+  - **Smart Genre Taxonomy**: Dynamic semantic chip selector based on plot keyword extraction (*Action*, *Sci-Fi*, *Comedy*, *Drama*, *Horror*, *Thriller*, *Adventure*, *Animation*, etc.) with real-time match counters.
 - 🎴 **Cinematic Grid View**:
   - Generative atmospheric gradient posters tailored to each title.
   - High-contrast badges for resolution profile, release year, duration, and season counts.
   - Interactive hover state displaying synopsis preview, stream codecs, and detail inspection.
 - 📋 **High-Density Technical Table View**:
   - Default high-density view (100 items per page with 25/50/100/200 options) engineered for media curators.
-  - Fully sortable columns: **Title**, **Section**, **Year**, **Resolution**, **Video Codec**, **Audio Codec**, **Duration**, and **Storage Size (GB)**.
+  - Optimized column layout: **Titolo**, **Sezione**, **Anno**, **Regista**, **Risoluzione**, **Durata**, and **Dimensione (GB)**.
+  - Intuitive full-row click navigation directly opens the detail drawer (redundant action buttons eliminated for maximum data width).
 - 🔬 **Media Detail Drawer & Season/Episode Explorer**:
   - Fluid glassmorphic slide-out modal with backdrop blur and keyboard shortcut navigation (`ESC` to close).
   - **Regia & Cast Principale**: Dedicated section showcasing the director and top 5 billing actors with interactive 1-click filter chips.
+  - **Stagioni ed Episodi Explorer**: For episodic shows (TV Series, Anime, Cartoons), the season accordion and episode breakdown is positioned directly below the Cast section for immediate navigation, prior to technical specs and storage paths.
   - Exact technical specifications: width × height resolution, computed aspect ratio (e.g. *16:9*, *2.39:1 Cinemascope*), audio channels (e.g. *5.1 Surround*, *Stereo*), all audio language streams, and subtitle tracks (SRT, PGS, VOBSUB).
-  - **Multi-Season & Episode Explorer** for episodic shows: browse season tabs, inspect individual episode synopses, and copy individual video file paths.
+  - Single-click copy of absolute local storage paths with visual feedback.
+- 🛡️ **Privacy & Security Focused**:
+  - Public repository contains only the web application code and bundled catalog database (`catalog_data.json`).
+  - Internal extraction scripts (`export_plex.py`), private server paths, and redundant CSV exports are kept strictly local and excluded via `.gitignore`.
+  - Automatic **7-Day Freshness Monitor**: checks catalog timestamp and alerts the user if data needs synchronization from the Plex server.
 - 🚀 **Zero-Lag Architecture**: In-memory indexing and single-pass normalization handling **2,969 titles** and over **24,670 episodes** at steady 60 FPS.
 
 ---
 
 ## 📊 Catalog Dataset Overview
 
-The application indexes a rich multi-library local storage structure:
+The application indexes a rich multi-library storage structure via `data/catalog_data.json`:
 
 | Library Section | Titles Indexed | Format | Details Available |
 | :--- | :---: | :---: | :--- |
-| 🎬 **Movies (Film)** | **2,518** | Feature Films | Full video/audio streams, subtitles, exact resolutions, file paths |
-| 📺 **TV Shows (Serie TV)** | **168** | Episodic Shows | 6,694 individual episodes with season breakdown and specs |
+| 🎬 **Movies (Film)** | **2,518** | Feature Films | Director, top 5 actors, video/audio streams, subtitles, exact resolutions, file paths |
+| 📺 **TV Shows (Serie TV)** | **168** | Episodic Shows | 6,694 individual episodes with season breakdown and episodic specs |
 | 🌸 **Anime** | **215** | Episodic Shows | 13,292 episodes with dual-audio, FLAC/AAC tracks, and subtitles |
 | 🎨 **Cartoons** | **68** | Episodic Shows | 4,690 episodes with season-level media properties |
 | **TOTAL** | **2,969** | **27,190+ Files** | **Comprehensive multi-terabyte library cataloged** |
@@ -134,12 +141,12 @@ plex-media-catalog/
 ├── .github/
 │   └── workflows/
 │       └── deploy.yml             # GitHub Actions CI/CD Pages deployment workflow
-├── data/                          # Source datasets (JSON & CSV dumps)
-│   ├── catalog_data.json          # Main hierarchical catalog (30 MB)
-│   ├── film_metadata.csv          # Movies tabular dataset
-│   ├── serie_tv_metadata.csv      # TV Series episode dataset
-│   ├── anime_metadata.csv         # Anime episode dataset
-│   └── cartoon_metadata.csv       # Cartoons episode dataset
+├── data/                          # Source datasets
+│   ├── catalog_data.json          # Main hierarchical catalog (bundled with web app)
+│   └── *.csv                      # Raw tabular exports (local only, in .gitignore)
+├── scripts/                       # Local offline maintenance (local only, in .gitignore)
+│   ├── export_plex.py             # Python script extracting data from Plex SQLite DB
+│   └── enrich_catalog.cjs         # Metadata enrichment helper
 ├── src/
 │   ├── components/
 │   │   ├── common/                # Reusable UI badges and stat cards
@@ -147,18 +154,17 @@ plex-media-catalog/
 │   │   │   └── StatCard.tsx       # Metric cards for library totals
 │   │   ├── detail/                # Modal / Drawer technical inspector
 │   │   │   ├── MediaDetailDrawer.tsx # Slide-out technical inspection drawer
-│   │   │   └── SeasonAccordion.tsx   # Multi-season & episode browser
+│   │   │   └── SeasonAccordion.tsx   # Multi-season & episode browser (below cast)
 │   │   ├── filters/               # Filter panel components
-│   │   │   └── FilterSidebar.tsx  # Search, resolution, year slider & genre chips
+│   │   │   └── FilterSidebar.tsx  # Fixed sidebar with isolated scroll, dual slider & filters
 │   │   ├── grid/                  # Grid presentation
 │   │   │   ├── MediaCard.tsx      # Atmospheric poster card with live specs
 │   │   │   ├── MediaGrid.tsx      # Responsive CSS grid & pagination controls
 │   │   │   └── ViewToggle.tsx     # Grid vs Table view switcher & sort dropdown
 │   │   ├── layout/                # Structural containers
-│   │   │   ├── Header.tsx         # Plex branding, live stats, and section tabs
-│   │   │   └── Footer.tsx         # Versioning and storage summary
+│   │   │   └── Header.tsx         # Plex branding, live stats, search bar & freshness badge
 │   │   └── table/                 # Tabular presentation
-│   │       └── MediaTable.tsx     # Dense sortable table with instant path copying
+│   │       └── MediaTable.tsx     # Dense sortable table (Titolo, Sezione, Anno, Regista...)
 │   ├── hooks/
 │   │   ├── useCatalogData.ts      # Data loader, normalizer, and in-memory cache
 │   │   ├── useCatalogFilter.ts    # Reactive multi-criteria filtering engine
@@ -172,7 +178,7 @@ plex-media-catalog/
 │   ├── App.tsx                    # Root application component
 │   ├── main.tsx                   # Application entry point
 │   └── index.css                  # Design tokens, scrollbar styling, and utilities
-├── PROJECT_GUIDELINES.md          # Architectural blueprint and design specification
+├── PROJECT_GUIDELINES.md          # Comprehensive architectural blueprint and specs
 ├── vite.config.ts                 # Vite bundler configuration & relative base path
 ├── tailwind.config.js             # Theme tokens and custom color palettes
 ├── tsconfig.json                  # TypeScript compiler settings

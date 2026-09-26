@@ -46,13 +46,14 @@ export default defineConfig(({ command }) => {
             }
             const files = fs.readdirSync(srcData);
             for (const file of files) {
+              if (file.endsWith('.csv')) continue;
               const srcFile = path.resolve(srcData, file);
               const distFile = path.resolve(distData, file);
               if (fs.statSync(srcFile).isFile()) {
                 fs.copyFileSync(srcFile, distFile);
               }
             }
-            console.log('✓ Successfully copied data files to dist/data for deployment');
+            console.log('✓ Successfully copied catalog data file to dist/data for deployment');
           }
         }
       }

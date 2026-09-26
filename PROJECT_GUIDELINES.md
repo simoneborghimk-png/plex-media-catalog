@@ -8,12 +8,9 @@
 ## 1. Schema Dati & Mapping Tecnico
 
 ### 1.1 Analisi delle Sorgenti Dati
-Il catalogo multimediale locale è costituito da una sorgente primaria strutturata in formato JSON e da dataset tabulari di supporto in formato CSV:
-- **`data/catalog_data.json`** (~30.6 MB): Contiene la totalità del catalogo gerarchico, arricchito con metadati di runtime, ripartito in 4 macro-librerie (`film`, `serie_tv`, `anime`, `cartoon`) per un totale di **2.969 titoli** e oltre **24.670 episodi**.
-- **`data/film_metadata.csv`** (2.518 record): Esportazione tabulare piatta specifica per i lungometraggi.
-- **`data/serie_tv_metadata.csv`** (6.694 record): Record dettagliati per singolo episodio delle Serie TV.
-- **`data/anime_metadata.csv`** (13.292 record): Record dettagliati per singolo episodio degli Anime.
-- **`data/cartoon_metadata.csv`** (4.690 record): Record dettagliati per singolo episodio dei Cartoni Animati.
+Il catalogo multimediale è basato su una sorgente primaria strutturata in formato JSON e da dataset tabulari di supporto in formato CSV:
+- **`data/catalog_data.json`** (~31.6 MB): È la **sorgente dati unica e completa** utilizzata dall'applicazione web (e inclusa nel bundle di produzione/GitHub Pages). Contiene la totalità del catalogo gerarchico, arricchito con metadati di runtime, registi, cast principale (top 5 attori), stagioni ed episodi, ripartito in 4 macro-librerie (`film`, `serie_tv`, `anime`, `cartoon`) per un totale di **2.969 titoli** e oltre **24.670 episodi**.
+- **Dataset CSV locali** (`data/*.csv`): Esportazioni tabulari piatte generate dallo script di estrazione ad uso locale/analitico. Poiché l'applicazione web carica esclusivamente il file JSON, tutti i file CSV sono esclusi dal repository Git pubblico tramite `.gitignore` e preservati localmente.
 
 ### 1.2 Struttura del JSON Principale (`data/catalog_data.json`)
 ```json
@@ -54,7 +51,7 @@ Ogni film possiede direttamente le informazioni del file multimediale corrispond
 | `tracce_audio` | `string` | Elenco delle tracce presenti (es. `"it (DCA), en (AC3)"`) |
 | `sottotitoli` | `string` | Elenco stream sottotitoli (es. `"it (SRT), it (VOBSUB), en (PGS)"`) |
 | `dimensione_gb` | `number \| null` | Dimensione occupata sul filesystem in Gigabyte (es. `6.72`) |
-| `file_path` | `string` | Percorso assoluto su volume di storage (es. `"L:\\500.giorni.insieme.2009.mkv"`) |
+| `file_path` | `string \| undefined` | Percorso opzionale su storage locale (omesso nel catalogo pubblico per motivi di privacy) |
 | `regista` | `string \| undefined` | Regista dell'opera (es. `"Marc Webb"`, `"Sam Mendes"`, `"Stanley Kubrick"`) |
 | `attori` | `string[] \| undefined` | Primi 5 attori principali in ordine di importanza / billing |
 
@@ -80,7 +77,7 @@ Le opere a episodi sono modellate gerarchicamente in `stagioni` ed `episodi`.
   - `numero`: Numero progressivo nell'ambito della stagione
   - `titolo`: Titolo dell'episodio
   - `trama`: Sinossi episodio
-  - `durata_min`, `risoluzione`, `larghezza`, `altezza`, `codec_video`, `codec_audio`, `canali_audio`, `tracce_audio`, `sottotitoli`, `dimensione_gb`, `file_path`.
+  - `durata_min`, `risoluzione`, `larghezza`, `altezza`, `codec_video`, `codec_audio`, `canali_audio`, `tracce_audio`, `sottotitoli`, `dimensione_gb`, `file_path` (opzionale/locale).
 
 ### 1.4 Unificazione del Modello per la UI (`UnifiedMediaItem`)
 Per consentire una navigazione fluida, filtri trasversali e una visualizzazione coerente sia in griglia che in tabella, i dati vengono normalizzati dal layer dati (`useCatalogData`) in un'interfaccia unificata:
@@ -105,7 +102,7 @@ export interface UnifiedMediaItem {
   codec_audio_principale: string; // DCA, AC3, FLAC, ecc.
   tracce_audio_riassunto: string; // it, en, ja, ecc.
   ha_sottotitoli: boolean;
-  file_path_primario: string;     // Percorso film o primo episodio disponibile
+  file_path_primario?: string;    // Percorso opzionale del file (omesso nel build pubblico)
   
   // Dati specifici per Serie/Anime/Cartoon
   numero_stagioni?: number;
@@ -143,40 +140,30 @@ Dato che il dataset nativo non include una colonna esplicita di genere per tutti
 ### 2.2 Struttura Modulare delle Directory
 ```
 plex-media-catalog/
-├── data/                               # Dataset originali (JSON e CSV)
-├── public/                             # Asset pubblici, icone Plex, favicon
-│   └── data/                           # Collegamento/copia per servire catalog_data.json
+├── data/                               # Dataset del catalogo
+│   ├── catalog_data.json               # Sorgente JSON primaria per la web app (tracciata)
+│   └── *.csv                           # Esportazioni CSV grezze (locali, in .gitignore)
+├── scripts/                            # Script di utilità locale (in .gitignore)
+│   ├── export_plex.py                  # Script Python estrazione SQLite Plex (locale/sicuro)
+│   └── enrich_catalog.cjs              # Script ausiliario di arricchimento
 ├── src/
 │   ├── components/
 │   │   ├── common/                     # Componenti base riutilizzabili
-│   │   │   ├── Badge.tsx               # Pillole per risoluzione, formati e generi
-│   │   │   ├── StatCard.tsx            # Indicatori numerici di catalogo
-│   │   │   ├── Button.tsx              # Bottoni stilizzati con feedback aptico
-│   │   │   └── SearchInput.tsx         # Input di ricerca con clear e scorciatoia da tastiera
+│   │   │   ├── Badge.tsx               # Pillole per risoluzione, sezione e codec
+│   │   │   └── StatCard.tsx            # Indicatori numerici di catalogo
 │   │   ├── filters/                    # Modulo filtri avanzati
-│   │   │   ├── FilterSidebar.tsx       # Pannello laterale pieghevole con tutti i comandi
-│   │   │   ├── SectionTabs.tsx         # Selezione rapida: Tutti, Film, Serie, Anime, Cartoon
-│   │   │   ├── GenreFilter.tsx         # Multi-select a pillole con conteggio titoli dinamico
-│   │   │   ├── ResolutionSelector.tsx  # Toggle pillole 4K, 1080p, 720p, SD
-│   │   │   ├── YearRangeSlider.tsx     # Range slider a doppia maniglia per gli anni
-│   │   │   ├── CodecFilter.tsx         # Filtri specifici per codec audio e video
-│   │   │   └── SortDropdown.tsx        # Selettore ordinamento (Titolo, Anno, Durata, Spazio GB)
+│   │   │   └── FilterSidebar.tsx       # Sidebar fissa a sinistra con scroll isolato, filtri registi, cast, risoluzioni e anno
 │   │   ├── grid/                       # Visualizzazione a Griglia
-│   │   │   ├── MediaGrid.tsx           # Griglia responsiva con CSS auto-fill
-│   │   │   ├── MediaCard.tsx           # Card con poster gradient, badge codec, hover animato
-│   │   │   └── ViewToggle.tsx          # Switch rapido Griglia / Tabella
+│   │   │   ├── MediaGrid.tsx           # Griglia responsiva con CSS auto-fill e paginazione
+│   │   │   ├── MediaCard.tsx           # Card con poster gradient, badge e hover reattivo
+│   │   │   └── ViewToggle.tsx          # Switch Griglia / Tabella e selettore ordinamento
 │   │   ├── table/                      # Visualizzazione Tabellare Tecnica
-│   │   │   ├── MediaTable.tsx          # Tabella ad alta densità informativa
-│   │   │   ├── TableHeader.tsx         # Colonne ordinabili con indicatori visivi
-│   │   │   └── TableRow.tsx            # Riga con badge e copia percorso istantanea
+│   │   │   └── MediaTable.tsx          # Tabella ad alta densità (Titolo, Sezione, Anno, Regista, Risoluzione, Durata, GB) con click su riga
 │   │   ├── detail/                     # Modal / Drawer di Dettaglio Tecnico
-│   │   │   ├── MediaDetailDrawer.tsx   # Drawer laterale / Modal con effetto glassmorphism
-│   │   │   ├── TechnicalSpecs.tsx      # Scheda tecnica (risoluzione, codec, bitrate, tracce)
-│   │   │   ├── SeasonAccordion.tsx     # Esploratore stagioni ed episodi per Serie/Anime
-│   │   │   └── EpisodeItemView.tsx     # Dettaglio singolo episodio con copia path
+│   │   │   ├── MediaDetailDrawer.tsx   # Drawer con Regia & Cast, Stagioni/Episodi subito sotto il Cast, e Specifiche Tecniche
+│   │   │   └── SeasonAccordion.tsx     # Accordion per esplorazione gerarchica di stagioni ed episodi
 │   │   └── layout/                     # Struttura di pagina
-│   │       ├── Header.tsx              # Barra superiore con logo Plex, stats, e ricerca
-│   │       └── Footer.tsx              # Informazioni di versione e timestamp aggiornamento
+│   │       └── Header.tsx              # Barra superiore con logo Plex, stats, ricerca e badge freschezza (Footer rimosso)
 │   ├── hooks/
 │   │   ├── useCatalogData.ts           # Caricamento, caching e indicizzazione del dataset
 │   │   ├── useCatalogFilter.ts         # Motore reattivo memoizzato di filtraggio e ordinamento
@@ -190,7 +177,7 @@ plex-media-catalog/
 │   ├── App.tsx                         # Componente principale
 │   ├── main.tsx                        # Bootstrap React
 │   └── index.css                       # Design System CSS, variabili colore e utility
-├── PROJECT_GUIDELINES.md               # Specifiche di progetto (questo documento)
+├── PROJECT_GUIDELINES.md               # Specifiche di progetto e linee guida architetturali
 ├── index.html                          # Entry point HTML semantico
 ├── package.json                        # Configurazione dipendenze e script
 ├── tailwind.config.js                  # Configurazione tema Tailwind
@@ -245,46 +232,46 @@ Ispirata all'interfaccia cinematografica di Plex con contrasti studiati per lung
    - Indicatori in tempo reale: Titoli Totali, Film, Serie TV, Anime, Cartoni, Dimensione Storage Totale (in Terabyte).
    - Barra di ricerca globale integrata con scorciatoia da tastiera (`Cmd+K` / `Ctrl+K`) e pulsante di cancellazione rapida.
 
-2. **Sidebar Filtri Reattiva**:
-   - Sezione tipo media con pillole a badge contatore.
-   - Range slider per l'anno con tooltip dinamico.
-   - Pillole di risoluzione ad attivazione toggle immediata.
-   - Selettore generi a chip con visualizzazione della quantità di titoli associati.
-   - Selettore filtri tecnici avanzati (Codec video HEVC/H264, Codec audio DCA/AC3).
-   - Pulsante "Reimposta Filtri" sempre visibile quando sono applicati filtri.
+2. **Sidebar Filtri Reattiva (Fixed & Scroll Isolato)**:
+   - Fissata sul bordo sinistro della pagina (`fixed left-0 top-16 bottom-0 z-40`) per consentire accesso continuo ai controlli.
+   - **Scroll isolato per area di hover**: lo scrolling con cursore sopra la sidebar muove esclusivamente i filtri, mentre lo scrolling sopra il catalogo muove la griglia/tabella.
+   - Disposizione ordinata dei controlli:
+     1. Selettore Sezioni Media (Film, Serie TV, Anime, Cartoon).
+     2. Ricerca & Filtro Regista (con autocompletamento e contatore occorrenze).
+     3. Ricerca & Filtro Cast Principale (top 5 attori per importanza di billing).
+     4. Filtro Anno di Uscita a doppio slider range (estremi min/max configurabili).
+     5. Pillole Risoluzione Video (4K UHD, 1080p FHD, 720p HD, SD) posizionate strategicamente subito sopra i codec.
+     6. Specifiche Codec Video (HEVC, H264, ecc.) e Codec Audio (DCA, AC3, FLAC, ecc.).
+     7. Tassonomia Generi con pillole e conteggio numerico istantaneo.
+     8. Pulsante "Reimposta Filtri" visibile quando sono attivi criteri restrittivi.
 
 3. **Griglia Multimediale (`MediaCard`)**:
-   - Proporzione card cinematografica (locandina 2:3 o ratio 16:10 elegante).
-   - Miniatura generativa ricca basata su gradiente d'atmosfera con iniziale tipografica e backdrop visuale.
+   - Proporzione card cinematografica elegante con backdrop visuale generativo a gradiente.
    - Badge sovrapposti per risoluzione, sezione e anno.
    - Area hover con comparsa rapida di dettagli tecnici: codec, durata/episodi e pulsante di ispezione rapida.
 
 4. **Vista Tabellare Alternativa (`MediaTable`)**:
-   - Progettata per utenti tecnici e amministratori di storage Plex.
-   - Colonne: Titolo, Tipo, Anno, Risoluzione, Codec Video, Codec Audio, Durata, Dimensione GB, File Path, Azioni.
-   - Ordinamento cliccabile per colonna con frecce indicatrici.
-   - Pulsante di copia immediata del percorso file con tooltip di conferma ("Copiato!").
+   - Progettata per utenti tecnici e consultazione rapida del catalogo.
+   - Colonne ottimizzate: **Titolo**, **Sezione**, **Anno**, **Regista** (posizionato a destra dell'Anno), **Risoluzione**, **Durata**, **Dimensione (GB)**.
+   - Navigazione immediata: cliccando in qualunque punto della riga viene aperta la scheda dettaglio (nessuna colonna azioni superflua).
+   - Ordinamento cliccabile su tutte le colonne con indicatori a freccia.
 
-5. **Drawer / Modal Dettagli Tecnici (`MediaDetailDrawer`)**:
-   - Apertura laterale fluida con backdrop-filter blur.
-   - Ispezione tecnica approfondita: risoluzione esatta (larghezza x altezza), bitrate/dimensione, stream audio multipli, sottotitoli completi.
-   - Percorso del file completo evidenziato in un blocco codice mono-spazio con tasto di copia a un clic.
-   - **Esploratore Stagioni & Episodi per Serie, Anime e Cartoni**:
-     - Selettore a tab per le stagioni (`Stagione 1`, `Stagione 2`, `Speciali`).
-     - Lista degli episodi con titolo, numero, durata, risoluzione e percorso individuale di ciascun file MKV/MP4.
+5. **Drawer Dettagli Tecnici (`MediaDetailDrawer`)**:
+   - Apertura laterale fluida con backdrop-filter blur e navigazione con tasto `ESC`.
+   - **Regia & Cast Principale**: box dedicato con regista e i 5 attori principali con chip cliccabili per filtrare istantaneamente.
+   - **Esploratore Stagioni & Episodi (Serie TV, Anime, Cartoon)**: collocato **immediatamente sotto a Regia e Cast**, consentendo navigazione gerarchica rapida di stagioni ed episodi prima delle specifiche hardware.
+   - Specifiche Tecniche Audio & Video: risoluzione pixel, aspect ratio calcolato, canali audio, tracce linguistiche e sottotitoli.
+   - Percorso del file opzionale con tasto di copia rapida negli appunti (mostrato solo se presente in locale).
 
 ---
 
 ## 4. Strategie di Performance & Ottimizzazione
 
 ### 4.1 Caricamento e Caching del Dataset
-- `catalog_data.json` viene servito localmente tramite il server Vite nella cartella `public/data/`.
+- `catalog_data.json` viene servito tramite il server Vite / GitHub Pages nella cartella `data/`.
 - Un hook dedicato `useCatalogData` effettua la richiesta una sola volta all'avvio dell'applicazione.
 - Durante il caricamento, viene mostrato uno scheletro UI elegante con barra di progresso e indicatore dello stato di indicizzazione.
-- I 2.969 record vengono pre-elaborati in una singola passata creando:
-  - Un indice di ricerca normalizzato in caratteri minuscoli.
-  - Generi assegnati.
-  - Aggregazioni per le serie (totale episodi, storage cumulativo, risoluzione massima).
+- I 2.969 record vengono pre-elaborati in una singola passata creando un indice normalizzato e aggregando le informazioni di serie ed episodi.
 
 ### 4.2 Debounce e Memoizzazione
 - La ricerca testuale impiega un debounce di **180ms**, evitando ricalcoli inutili a ogni singolo tasto premuto.
@@ -292,7 +279,7 @@ Ispirata all'interfaccia cinematografica di Plex con contrasti studiati per lung
 - Il calcolo dei conteggi per i generi e le risoluzioni disponibili è calcolato contestualmente sui record filtrati correnti.
 
 ### 4.3 Paginazione Fluida
-- Paginazione client-side configurabile (36 o 72 elementi per pagina).
+- Paginazione client-side configurabile (25, 50, 100 o 200 elementi per pagina).
 - Navigazione istantanea con tastiera o pulsanti "Precedente/Successiva" e selettore pagina diretto.
 - Reset automatico a pagina 1 a ogni variazione dei filtri di ricerca.
 
@@ -301,11 +288,10 @@ Ispirata all'interfaccia cinematografica di Plex con contrasti studiati per lung
 ## 5. Comandi di Setup, Build & Run
 
 ### 5.1 Prerequisiti
-- **Node.js**: Versione 18.0 o superiore (installato Node.js LTS v24+).
-- **NPM**: Versione 9.0 o superiore (installato NPM v11+).
+- **Node.js**: Versione 18.0 o superiore (LTS raccomandata).
+- **NPM**: Versione 9.0 o superiore.
 
 ### 5.2 Installazione Dipendenze
-Dalla root del progetto `c:\Users\simon\projects\plex-media-catalog`:
 ```powershell
 npm install
 ```
@@ -314,18 +300,17 @@ npm install
 ```powershell
 npm run dev
 ```
-Il server di sviluppo locale Vite si avvierà su `http://localhost:5173/`.
 
-### 5.4 Build di Produzione e Preview
+### 5.4 Build di Produzione e Deploy
 ```powershell
 npm run build
 npm run preview
 ```
-I file compilati e ottimizzati verranno generati nella cartella `dist/`.
+I file compilati e ottimizzati verranno generati nella cartella `dist/` e distribuiti automaticamente su GitHub Pages tramite GitHub Actions.
 
 ---
 
-## 6. Pipeline di Esportazione Plex & Politica di Freschezza Dati (7 Giorni)
+## 6. Pipeline di Esportazione, Privacy & Politica di Freschezza Dati
 
 ### 6.1 Script di Esportazione Plex (`scripts/export_plex.py`)
 I dati primari risiedono nel database SQLite originale di Plex Media Server (`com.plexapp.plugins.library.db`).
@@ -336,7 +321,14 @@ Per estrarre i metadati completi:
 4. Lo script effettua una copia temporanea a caldo (`safe_copy_database`) includendo i file `-wal` e `-shm` per evitare deadlock SQLite durante l'esecuzione del server Plex.
 5. I file generati (`catalog_data.json` e i CSV di supporto) vengono sincronizzati via LAN SMB su `DEV_MACHINE_DATA_DIR`.
 
-### 6.2 Politica di Verifica Freschezza (7 Giorni)
+### 6.2 Politica di Sicurezza & Igiene del Repository Git
+- **Dati Pubblici vs Privati**:
+  - `data/catalog_data.json` è la sorgente dati del catalogo multimediale utilizzata dall'applicazione web. Per tutelare la privacy e la sicurezza dei dispositivi privati, il catalogo pubblico non include percorsi locali di storage (`file_path`).
+  - La cartella `scripts/` (contenente script di estrazione con logiche private di sincronizzazione LAN e query di manutenzione locale) è **esclusa da Git** tramite `.gitignore` e preservata esclusivamente in locale.
+  - I file tabulari grezzi `data/*.csv` sono esclusi da Git tramite `.gitignore` e preservati localmente.
+  - La cartella di configurazione AI `.agents/` è esclusa da Git tramite `.gitignore` e preservata localmente.
+
+### 6.3 Politica di Verifica Freschezza (7 Giorni)
 - Ogni esportazione appone nel JSON il timestamp ISO `metadata.last_updated` e `metadata.last_updated_display`.
 - Sia l'assistente AI sia l'interfaccia utente (tramite badge e banner in `Header.tsx`) verificano se `daysSinceUpdate > 7`:
   - Se i dati superano i 7 giorni, viene mostrato un avviso esplicito che invita l'utente a rilanciare `export_plex.py` sul server Plex.
