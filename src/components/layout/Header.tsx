@@ -9,21 +9,40 @@ import {
   Layers,
   AlertTriangle
 } from 'lucide-react';
-import { CatalogStats, MediaSection } from '../../types/catalog';
+import { CatalogStats, MediaSection, ViewMode } from '../../types/catalog';
 import { formatStorage } from '../../utils/formatters';
+import { ViewToggle } from '../grid/ViewToggle';
 
 interface HeaderProps {
   stats: CatalogStats | null;
   activeSections: MediaSection[];
   onToggleSection: (section: MediaSection) => void;
   onSelectAllSections: () => void;
+  viewMode: ViewMode;
+  onViewModeChange: (mode: ViewMode) => void;
+  itemsPerPage: number;
+  onItemsPerPageChange: (count: number) => void;
+  totalFilteredCount: number;
+  onOpenMobileFilters: () => void;
+  isDesktopSidebarOpen?: boolean;
+  onToggleDesktopSidebar?: () => void;
+  isFiltered: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   stats,
   activeSections,
   onToggleSection,
-  onSelectAllSections
+  onSelectAllSections,
+  viewMode,
+  onViewModeChange,
+  itemsPerPage,
+  onItemsPerPageChange,
+  totalFilteredCount,
+  onOpenMobileFilters,
+  isDesktopSidebarOpen = true,
+  onToggleDesktopSidebar,
+  isFiltered
 }) => {
   const isAllSelected = activeSections.length === 0;
 
@@ -103,87 +122,102 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         )}
 
-        {/* Section Tabs Quick Selector */}
-        {stats && (
-          <div className="py-2.5 flex items-center gap-2 overflow-x-auto no-scrollbar">
-            <button
-              onClick={onSelectAllSections}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                isAllSelected
-                  ? 'bg-amber-500 text-slate-950 font-semibold shadow-[0_0_12px_rgba(229,160,13,0.3)]'
-                  : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.05]'
-              }`}
-            >
-              <Layers className="w-3.5 h-3.5" />
-              <span>Tutti i Media</span>
-              <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                isAllSelected ? 'bg-black/20 text-black font-bold' : 'bg-white/[0.08] text-slate-400'
-              }`}>
-                {stats.totalTitles}
-              </span>
-            </button>
+        {/* Section Tabs Quick Selector & View Controls Bar */}
+        <div className="py-2.5 flex items-center justify-between gap-3 min-w-0">
+          {stats && (
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 min-w-0">
+              <button
+                onClick={onSelectAllSections}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0 ${
+                  isAllSelected
+                    ? 'bg-amber-500 text-slate-950 font-semibold shadow-[0_0_12px_rgba(229,160,13,0.3)]'
+                    : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.05]'
+                }`}
+              >
+                <Layers className="w-3.5 h-3.5" />
+                <span>Tutti i Media</span>
+                <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                  isAllSelected ? 'bg-black/20 text-black font-bold' : 'bg-white/[0.08] text-slate-400'
+                }`}>
+                  {stats.totalTitles}
+                </span>
+              </button>
 
-            <button
-              onClick={() => onToggleSection('film')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                activeSections.includes('film')
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/50 shadow-[0_0_12px_rgba(229,160,13,0.15)] font-semibold'
-                  : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.05]'
-              }`}
-            >
-              <Film className="w-3.5 h-3.5 text-amber-400" />
-              <span>Film</span>
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-white/[0.08] text-slate-400">
-                {stats.totalFilms}
-              </span>
-            </button>
+              <button
+                onClick={() => onToggleSection('film')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0 ${
+                  activeSections.includes('film')
+                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/50 shadow-[0_0_12px_rgba(229,160,13,0.15)] font-semibold'
+                    : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.05]'
+                }`}
+              >
+                <Film className="w-3.5 h-3.5 text-amber-400" />
+                <span>Film</span>
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-white/[0.08] text-slate-400">
+                  {stats.totalFilms}
+                </span>
+              </button>
 
-            <button
-              onClick={() => onToggleSection('serie_tv')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                activeSections.includes('serie_tv')
-                  ? 'bg-blue-500/20 text-blue-300 border border-blue-500/50 shadow-[0_0_12px_rgba(59,130,246,0.15)] font-semibold'
-                  : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.05]'
-              }`}
-            >
-              <Tv className="w-3.5 h-3.5 text-blue-400" />
-              <span>Serie TV</span>
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-white/[0.08] text-slate-400">
-                {stats.totalSeries}
-              </span>
-            </button>
+              <button
+                onClick={() => onToggleSection('serie_tv')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0 ${
+                  activeSections.includes('serie_tv')
+                    ? 'bg-blue-500/20 text-blue-300 border border-blue-500/50 shadow-[0_0_12px_rgba(59,130,246,0.15)] font-semibold'
+                    : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.05]'
+                }`}
+              >
+                <Tv className="w-3.5 h-3.5 text-blue-400" />
+                <span>Serie TV</span>
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-white/[0.08] text-slate-400">
+                  {stats.totalSeries}
+                </span>
+              </button>
 
-            <button
-              onClick={() => onToggleSection('anime')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                activeSections.includes('anime')
-                  ? 'bg-rose-500/20 text-rose-300 border border-rose-500/50 shadow-[0_0_12px_rgba(244,63,94,0.15)] font-semibold'
-                  : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.05]'
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5 text-rose-400" />
-              <span>Anime</span>
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-white/[0.08] text-slate-400">
-                {stats.totalAnime}
-              </span>
-            </button>
+              <button
+                onClick={() => onToggleSection('anime')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0 ${
+                  activeSections.includes('anime')
+                    ? 'bg-rose-500/20 text-rose-300 border border-rose-500/50 shadow-[0_0_12px_rgba(244,63,94,0.15)] font-semibold'
+                    : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.05]'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5 text-rose-400" />
+                <span>Anime</span>
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-white/[0.08] text-slate-400">
+                  {stats.totalAnime}
+                </span>
+              </button>
 
-            <button
-              onClick={() => onToggleSection('cartoon')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                activeSections.includes('cartoon')
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shadow-[0_0_12px_rgba(16,185,129,0.15)] font-semibold'
-                  : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.05]'
-              }`}
-            >
-              <Smile className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Cartoni</span>
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-white/[0.08] text-slate-400">
-                {stats.totalCartoons}
-              </span>
-            </button>
-          </div>
-        )}
+              <button
+                onClick={() => onToggleSection('cartoon')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0 ${
+                  activeSections.includes('cartoon')
+                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shadow-[0_0_12px_rgba(16,185,129,0.15)] font-semibold'
+                    : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.05]'
+                }`}
+              >
+                <Smile className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Cartoni</span>
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-white/[0.08] text-slate-400">
+                  {stats.totalCartoons}
+                </span>
+              </button>
+            </div>
+          )}
+
+          {/* View Controls Aligned to the Right */}
+          <ViewToggle
+            viewMode={viewMode}
+            onViewModeChange={onViewModeChange}
+            itemsPerPage={itemsPerPage}
+            onItemsPerPageChange={onItemsPerPageChange}
+            totalFilteredCount={totalFilteredCount}
+            onOpenMobileFilters={onOpenMobileFilters}
+            isDesktopSidebarOpen={isDesktopSidebarOpen}
+            onToggleDesktopSidebar={onToggleDesktopSidebar}
+            isFiltered={isFiltered}
+          />
+        </div>
       </div>
     </header>
   );

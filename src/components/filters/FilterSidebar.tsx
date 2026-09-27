@@ -135,7 +135,18 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   }, [sortedActors, actorSearch, showAllActors]);
 
   const filterBody = (
-    <div className="flex flex-col gap-6 p-4 sm:p-5">
+    <div className="flex flex-col gap-5 p-4 sm:p-5">
+
+      {/* Matching titles counter - compact and positioned above search */}
+      <div className="px-2.5 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06] text-[11px] flex items-center justify-between">
+        <span className="text-slate-400">Titoli corrispondenti:</span>
+        <span className="font-mono font-bold text-amber-400">
+          {totalFilteredCount.toLocaleString('it-IT')}{' '}
+          <span className="text-slate-500 font-normal text-[10px]">
+            / {totalCatalogCount.toLocaleString('it-IT')}
+          </span>
+        </span>
+      </div>
 
       {/* Search Input */}
       <div className="space-y-1.5">
@@ -168,14 +179,6 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
             </button>
           )}
         </div>
-      </div>
-
-      {/* Filter summary counter */}
-      <div className="px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06] text-xs flex items-center justify-between">
-        <span className="text-slate-400">Titoli corrispondenti:</span>
-        <span className="font-mono font-bold text-amber-400">
-          {totalFilteredCount.toLocaleString('it-IT')} <span className="text-slate-500 font-normal">/ {totalCatalogCount.toLocaleString('it-IT')}</span>
-        </span>
       </div>
 
       {/* Year Range Filter (Single Dual-Handle Range Slider) */}

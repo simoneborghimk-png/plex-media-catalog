@@ -3,7 +3,6 @@ import { useCatalogData } from './hooks/useCatalogData';
 import { useCatalogFilter } from './hooks/useCatalogFilter';
 import { Header } from './components/layout/Header';
 import { FilterSidebar } from './components/filters/FilterSidebar';
-import { ViewToggle } from './components/grid/ViewToggle';
 import { MediaGrid } from './components/grid/MediaGrid';
 import { MediaTable } from './components/table/MediaTable';
 import { MediaDetailDrawer } from './components/detail/MediaDetailDrawer';
@@ -97,12 +96,21 @@ export const App: React.FC = () => {
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-[#0a0d14] text-slate-100 flex flex-col">
-      {/* Top Header & Quick Section Toggles */}
+      {/* Top Header & Quick Section Toggles + View Controls */}
       <Header
         stats={stats}
         activeSections={filters.sections}
         onToggleSection={toggleSection}
         onSelectAllSections={setAllSections}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        itemsPerPage={filters.itemsPerPage}
+        onItemsPerPageChange={setItemsPerPage}
+        totalFilteredCount={totalFilteredCount}
+        onOpenMobileFilters={() => setIsMobileFilterOpen(true)}
+        isDesktopSidebarOpen={isDesktopSidebarOpen}
+        onToggleDesktopSidebar={() => setIsDesktopSidebarOpen(!isDesktopSidebarOpen)}
+        isFiltered={isFiltered}
       />
 
       {/* Main Split-Pane Body: Sidebar (flush left) + Media View (independent scroll) */}
@@ -135,22 +143,6 @@ export const App: React.FC = () => {
         {/* Media Content Area - Independent Scroll based on hover */}
         <main className="flex-1 min-w-0 h-full overflow-y-auto overscroll-contain px-4 sm:px-6 lg:px-8 py-6">
           <div className="max-w-[1720px] mx-auto">
-            {/* View Toolbar: Sort, Per Page, Grid/Table Switcher */}
-            <ViewToggle
-              viewMode={viewMode}
-              onViewModeChange={setViewMode}
-              sortBy={filters.sortBy}
-              sortDirection={filters.sortDirection}
-              onSortChange={setSort}
-              itemsPerPage={filters.itemsPerPage}
-              onItemsPerPageChange={setItemsPerPage}
-              totalFilteredCount={totalFilteredCount}
-              onOpenMobileFilters={() => setIsMobileFilterOpen(true)}
-              isDesktopSidebarOpen={isDesktopSidebarOpen}
-              onToggleDesktopSidebar={() => setIsDesktopSidebarOpen(!isDesktopSidebarOpen)}
-              isFiltered={isFiltered}
-            />
-
             {/* Grid or Table Display */}
             {viewMode === 'grid' ? (
               <MediaGrid
