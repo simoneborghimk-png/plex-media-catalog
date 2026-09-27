@@ -114,12 +114,18 @@ export const App: React.FC = () => {
         sortBy={filters.sortBy}
         sortDirection={filters.sortDirection}
         onSortChange={setSort}
+        searchQuery={filters.searchQuery}
+        onSearchChange={setSearchQuery}
       />
 
       {/* Main Split-Pane Body: Sidebar (flush left) + Media View (independent scroll) */}
       <div className="flex-1 flex w-full min-h-0 overflow-hidden relative">
         {/* Filter Sidebar - Attached flush to the left */}
         <FilterSidebar
+          stats={stats}
+          activeSections={filters.sections}
+          onToggleSection={toggleSection}
+          onSelectAllSections={setAllSections}
           filters={filters}
           facetCounts={facetCounts}
           totalFilteredCount={totalFilteredCount}

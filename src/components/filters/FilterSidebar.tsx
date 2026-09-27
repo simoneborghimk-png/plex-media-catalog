@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Search,
   X,
@@ -15,11 +15,19 @@ import {
   Clapperboard,
   User,
   Users,
-  PanelLeftClose
+  PanelLeftClose,
+  Layers,
+  Tv,
+  Sparkles,
+  Smile
 } from 'lucide-react';
-import { FilterState } from '../../types/catalog';
+import { FilterState, CatalogStats, MediaSection } from '../../types/catalog';
 
 interface FilterSidebarProps {
+  stats?: CatalogStats | null;
+  activeSections?: MediaSection[];
+  onToggleSection?: (section: MediaSection) => void;
+  onSelectAllSections?: () => void;
   filters: FilterState;
   facetCounts: {
     genres: Record<string, number>;
@@ -55,6 +63,10 @@ const VIDEO_CODECS = ['HEVC', 'H264', 'VC1', 'MPEG4'];
 const AUDIO_CODECS = ['DCA', 'AC3', 'EAC3', 'AAC', 'FLAC', 'TRUEHD'];
 
 export const FilterSidebar: React.FC<FilterSidebarProps> = ({
+  stats,
+  activeSections,
+  onToggleSection,
+  onSelectAllSections,
   filters,
   facetCounts,
   totalFilteredCount,
@@ -77,8 +89,28 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   isMobileOpen,
   onCloseMobile
 }) => {
-  const [showAllGenres, setShowAllGenres] = useState(false);
+  const isAllSelected = !activeSections || activeSections.length === 0;
+
+  // Initial state: expanded on desktop (>=1024px), collapsed on mobile (<1024px)
+  const isDesktop = typeof window !== 'undefined' ? window.innerWidth >= 1024 : false;
+  const [showGenres, setShowGenres] = useState(isDesktop);
+  const [showDirectors, setShowDirectors] = useState(isDesktop);
+  const [showActors, setShowActors] = useState(isDesktop);
+  const [showResolutions, setShowResolutions] = useState(isDesktop);
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Auto-collapse all collapsible categories when opening mobile filter drawer
+  useEffect(() => {
+    if (isMobileOpen) {
+      setShowGenres(false);
+      setShowDirectors(false);
+      setShowActors(false);
+      setShowResolutions(false);
+      setShowAdvanced(false);
+    }
+  }, [isMobileOpen]);
+
+  const [showAllGenres, setShowAllGenres] = useState(false);
   const [directorSearch, setDirectorSearch] = useState('');
   const [showAllDirectors, setShowAllDirectors] = useState(false);
   const [actorSearch, setActorSearch] = useState('');
@@ -137,6 +169,94 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   const filterBody = (
     <div className="flex flex-col gap-5 p-4 sm:p-5">
 
+      {/* Mobile Library Section Selector */}
+      {stats && onToggleSection && onSelectAllSections && (
+        <div className="lg:hidden space-y-1.5">
+          <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+            <Layers className="w-3.5 h-3.5 text-amber-400" />
+            Libreria
+          </label>
+          <div className="flex flex-wrap items-center gap-1.5 py-0.5">
+            <button
+              onClick={onSelectAllSections}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                isAllSelected
+                  ? 'bg-amber-500 text-slate-950 font-semibold shadow-[0_0_12px_rgba(229,160,13,0.3)]'
+                  : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.05]'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>Tutti i Media</span>
+              <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                isAllSelected ? 'bg-black/20 text-black font-bold' : 'bg-white/[0.08] text-slate-400'
+              }`}>
+                {stats.totalTitles}
+              </span>
+            </button>
+
+            <button
+              onClick={() => onToggleSection('film')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                activeSections?.includes('film')
+                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/50 shadow-[0_0_12px_rgba(229,160,13,0.15)] font-semibold'
+                  : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.05]'
+              }`}
+            >
+              <Film className="w-3.5 h-3.5 text-amber-400" />
+              <span>Film</span>
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-white/[0.08] text-slate-400">
+                {stats.totalFilms}
+              </span>
+            </button>
+
+            <button
+              onClick={() => onToggleSection('serie_tv')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                activeSections?.includes('serie_tv')
+                  ? 'bg-blue-500/20 text-blue-300 border border-blue-500/50 shadow-[0_0_12px_rgba(59,130,246,0.15)] font-semibold'
+                  : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.05]'
+              }`}
+            >
+              <Tv className="w-3.5 h-3.5 text-blue-400" />
+              <span>Serie TV</span>
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-white/[0.08] text-slate-400">
+                {stats.totalSeries}
+              </span>
+            </button>
+
+            <button
+              onClick={() => onToggleSection('anime')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                activeSections?.includes('anime')
+                  ? 'bg-rose-500/20 text-rose-300 border border-rose-500/50 shadow-[0_0_12px_rgba(244,63,94,0.15)] font-semibold'
+                  : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.05]'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-rose-400" />
+              <span>Anime</span>
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-white/[0.08] text-slate-400">
+                {stats.totalAnime}
+              </span>
+            </button>
+
+            <button
+              onClick={() => onToggleSection('cartoon')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                activeSections?.includes('cartoon')
+                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shadow-[0_0_12px_rgba(16,185,129,0.15)] font-semibold'
+                  : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.05]'
+              }`}
+            >
+              <Smile className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Cartoni</span>
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-white/[0.08] text-slate-400">
+                {stats.totalCartoons}
+              </span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Matching titles counter - compact and positioned above search */}
       <div className="px-2.5 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06] text-[11px] flex items-center justify-between">
         <span className="text-slate-400">Titoli corrispondenti:</span>
@@ -148,8 +268,8 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
         </span>
       </div>
 
-      {/* Search Input */}
-      <div className="space-y-1.5">
+      {/* Search Input - Desktop only */}
+      <div className="hidden lg:block space-y-1.5">
         <label className="text-xs font-semibold text-slate-300 flex items-center justify-between">
           <span className="flex items-center gap-1.5">
             <Search className="w-3.5 h-3.5 text-slate-400" />
@@ -258,318 +378,404 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
       </div>
 
       {/* Genre Filter */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-            <Tag className="w-3.5 h-3.5 text-rose-400" />
-            Generi e Categorie
-          </label>
+      <div className="pt-2 border-t border-white/[0.08]">
+        <div className="flex items-center justify-between py-1.5">
+          <button
+            type="button"
+            onClick={() => setShowGenres(!showGenres)}
+            className="flex-1 flex items-center justify-between text-xs font-semibold text-slate-300 hover:text-white"
+          >
+            <span className="flex items-center gap-1.5">
+              <Tag className="w-3.5 h-3.5 text-rose-400" />
+              Generi e Categorie
+              {filters.genres.length > 0 && (
+                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  {filters.genres.length}
+                </span>
+              )}
+            </span>
+            {showGenres ? (
+              <ChevronUp className="w-3.5 h-3.5 text-slate-400" />
+            ) : (
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+            )}
+          </button>
           {filters.genres.length > 0 && (
             <button
               onClick={onClearGenres}
-              className="text-[11px] text-slate-400 hover:text-amber-400"
+              className="text-[11px] text-slate-400 hover:text-amber-400 ml-2 shrink-0"
+              title="Deseleziona tutti i generi"
             >
               Deseleziona
             </button>
           )}
         </div>
-        <div className="flex flex-wrap gap-1.5">
-          {displayedGenres.map(([genre, count]) => {
-            const isSelected = filters.genres.includes(genre);
 
-            return (
+        {showGenres && (
+          <div className="space-y-2 pt-2">
+            <div className="flex flex-wrap gap-1.5">
+              {displayedGenres.map(([genre, count]) => {
+                const isSelected = filters.genres.includes(genre);
+
+                return (
+                  <button
+                    key={genre}
+                    onClick={() => onToggleGenre(genre)}
+                    className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
+                      isSelected
+                        ? 'bg-amber-500/20 text-amber-300 border-amber-500/60 shadow-[0_0_8px_rgba(229,160,13,0.2)]'
+                        : 'bg-slate-900/60 text-slate-400 border-white/[0.06] hover:bg-slate-800/80 hover:text-slate-200'
+                    }`}
+                  >
+                    <span>{genre}</span>
+                    <span className="text-[10px] font-mono text-slate-400">
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            {sortedGenres.length > 10 && (
               <button
-                key={genre}
-                onClick={() => onToggleGenre(genre)}
-                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
-                  isSelected
-                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/60 shadow-[0_0_8px_rgba(229,160,13,0.2)]'
-                    : 'bg-slate-900/60 text-slate-400 border-white/[0.06] hover:bg-slate-800/80 hover:text-slate-200'
-                }`}
+                onClick={() => setShowAllGenres(!showAllGenres)}
+                className="text-xs text-amber-400/80 hover:text-amber-300 flex items-center gap-1 pt-1"
               >
-                <span>{genre}</span>
-                <span className="text-[10px] font-mono text-slate-400">
-                  {count}
-                </span>
+                {showAllGenres ? (
+                  <>
+                    <ChevronUp className="w-3 h-3" /> Mostra meno generi
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="w-3 h-3" /> Mostra tutti i generi ({sortedGenres.length})
+                  </>
+                )}
               </button>
-            );
-          })}
-        </div>
-        {sortedGenres.length > 10 && (
-          <button
-            onClick={() => setShowAllGenres(!showAllGenres)}
-            className="text-xs text-amber-400/80 hover:text-amber-300 flex items-center gap-1 pt-1"
-          >
-            {showAllGenres ? (
-              <>
-                <ChevronUp className="w-3 h-3" /> Mostra meno generi
-              </>
-            ) : (
-              <>
-                <ChevronDown className="w-3 h-3" /> Mostra tutti i generi ({sortedGenres.length})
-              </>
             )}
-          </button>
+          </div>
         )}
       </div>
 
       {/* Director Filter */}
-      <div className="space-y-2 pt-2 border-t border-white/[0.08]">
-        <div className="flex items-center justify-between">
-          <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-            <Clapperboard className="w-3.5 h-3.5 text-amber-400" />
-            Regia / Regista
-          </label>
+      <div className="pt-2 border-t border-white/[0.08]">
+        <div className="flex items-center justify-between py-1.5">
+          <button
+            type="button"
+            onClick={() => setShowDirectors(!showDirectors)}
+            className="flex-1 flex items-center justify-between text-xs font-semibold text-slate-300 hover:text-white"
+          >
+            <span className="flex items-center gap-1.5">
+              <Clapperboard className="w-3.5 h-3.5 text-amber-400" />
+              Regia / Regista
+              {filters.directors.length > 0 && (
+                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  {filters.directors.length}
+                </span>
+              )}
+            </span>
+            {showDirectors ? (
+              <ChevronUp className="w-3.5 h-3.5 text-slate-400" />
+            ) : (
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+            )}
+          </button>
           {filters.directors.length > 0 && (
             <button
               onClick={onClearDirectors}
-              className="text-[11px] text-slate-400 hover:text-amber-400"
+              className="text-[11px] text-slate-400 hover:text-amber-400 ml-2 shrink-0"
+              title="Deseleziona tutti i registi"
             >
               Deseleziona ({filters.directors.length})
             </button>
           )}
         </div>
 
-        {/* Selected Directors Chips */}
-        {filters.directors.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 pb-1">
-            {filters.directors.map((d) => (
-              <span
-                key={d}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/50 text-xs font-medium"
-              >
-                <span className="truncate max-w-[130px]">{d}</span>
-                <button
-                  onClick={() => onToggleDirector(d)}
-                  className="hover:text-white ml-0.5"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* Search input for directors */}
-        {sortedDirectors.length > 5 && (
-          <div className="relative">
-            <input
-              type="text"
-              value={directorSearch}
-              onChange={(e) => setDirectorSearch(e.target.value)}
-              placeholder="Filtra registi..."
-              className="w-full pl-7 pr-6 py-1 bg-slate-900/70 border border-white/[0.08] rounded-md text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
-            />
-            <Search className="w-3 h-3 text-slate-500 absolute left-2 top-2" />
-            {directorSearch && (
-              <button
-                onClick={() => setDirectorSearch('')}
-                className="absolute right-1.5 top-1.5 text-slate-400 hover:text-white"
-              >
-                <X className="w-3 h-3" />
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Directors List */}
-        {sortedDirectors.length > 0 ? (
-          <>
-            <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto pr-1 no-scrollbar">
-              {displayedDirectors.map(([director, count]) => {
-                const isSelected = filters.directors.includes(director);
-
-                return (
-                  <button
-                    key={director}
-                    onClick={() => onToggleDirector(director)}
-                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium border transition-all ${
-                      isSelected
-                        ? 'bg-amber-500/20 text-amber-300 border-amber-500/60 shadow-[0_0_8px_rgba(229,160,13,0.2)]'
-                        : 'bg-slate-900/60 text-slate-400 border-white/[0.06] hover:bg-slate-800/80 hover:text-slate-200'
-                    }`}
+        {showDirectors && (
+          <div className="space-y-2 pt-2">
+            {/* Selected Directors Chips */}
+            {filters.directors.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 pb-1">
+                {filters.directors.map((d) => (
+                  <span
+                    key={d}
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/50 text-xs font-medium"
                   >
-                    <span className="truncate max-w-[150px]">{director}</span>
-                    <span className="text-[10px] font-mono text-slate-400">
-                      {count}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {!directorSearch && sortedDirectors.length > 8 && (
-              <button
-                onClick={() => setShowAllDirectors(!showAllDirectors)}
-                className="text-xs text-amber-400/80 hover:text-amber-300 flex items-center gap-1 pt-0.5"
-              >
-                {showAllDirectors ? (
-                  <>
-                    <ChevronUp className="w-3 h-3" /> Mostra meno registi
-                  </>
-                ) : (
-                  <>
-                    <ChevronDown className="w-3 h-3" /> Mostra tutti i registi ({sortedDirectors.length})
-                  </>
-                )}
-              </button>
+                    <span className="truncate max-w-[130px]">{d}</span>
+                    <button
+                      onClick={() => onToggleDirector(d)}
+                      className="hover:text-white ml-0.5"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
             )}
-          </>
-        ) : (
-          <p className="text-xs text-slate-500 italic py-0.5">
-            Nessun metadato registi nel catalogo
-          </p>
+
+            {/* Search input for directors */}
+            {sortedDirectors.length > 5 && (
+              <div className="relative">
+                <input
+                  type="text"
+                  value={directorSearch}
+                  onChange={(e) => setDirectorSearch(e.target.value)}
+                  placeholder="Filtra registi..."
+                  className="w-full pl-7 pr-6 py-1 bg-slate-900/70 border border-white/[0.08] rounded-md text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                />
+                <Search className="w-3 h-3 text-slate-500 absolute left-2 top-2" />
+                {directorSearch && (
+                  <button
+                    onClick={() => setDirectorSearch('')}
+                    className="absolute right-1.5 top-1.5 text-slate-400 hover:text-white"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Directors List */}
+            {sortedDirectors.length > 0 ? (
+              <>
+                <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto pr-1 no-scrollbar">
+                  {displayedDirectors.map(([director, count]) => {
+                    const isSelected = filters.directors.includes(director);
+
+                    return (
+                      <button
+                        key={director}
+                        onClick={() => onToggleDirector(director)}
+                        className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium border transition-all ${
+                          isSelected
+                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/60 shadow-[0_0_8px_rgba(229,160,13,0.2)]'
+                            : 'bg-slate-900/60 text-slate-400 border-white/[0.06] hover:bg-slate-800/80 hover:text-slate-200'
+                        }`}
+                      >
+                        <span className="truncate max-w-[150px]">{director}</span>
+                        <span className="text-[10px] font-mono text-slate-400">
+                          {count}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {!directorSearch && sortedDirectors.length > 8 && (
+                  <button
+                    onClick={() => setShowAllDirectors(!showAllDirectors)}
+                    className="text-xs text-amber-400/80 hover:text-amber-300 flex items-center gap-1 pt-0.5"
+                  >
+                    {showAllDirectors ? (
+                      <>
+                        <ChevronUp className="w-3 h-3" /> Mostra meno registi
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="w-3 h-3" /> Mostra tutti i registi ({sortedDirectors.length})
+                      </>
+                    )}
+                  </button>
+                )}
+              </>
+            ) : (
+              <p className="text-xs text-slate-500 italic py-0.5">
+                Nessun metadato registi nel catalogo
+              </p>
+            )}
+          </div>
         )}
       </div>
 
       {/* Actor Filter */}
-      <div className="space-y-2 pt-2 border-t border-white/[0.08]">
-        <div className="flex items-center justify-between">
-          <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-            <Users className="w-3.5 h-3.5 text-sky-400" />
-            Attori Principali
-          </label>
+      <div className="pt-2 border-t border-white/[0.08]">
+        <div className="flex items-center justify-between py-1.5">
+          <button
+            type="button"
+            onClick={() => setShowActors(!showActors)}
+            className="flex-1 flex items-center justify-between text-xs font-semibold text-slate-300 hover:text-white"
+          >
+            <span className="flex items-center gap-1.5">
+              <Users className="w-3.5 h-3.5 text-sky-400" />
+              Attori Principali
+              {filters.actors.length > 0 && (
+                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                  {filters.actors.length}
+                </span>
+              )}
+            </span>
+            {showActors ? (
+              <ChevronUp className="w-3.5 h-3.5 text-slate-400" />
+            ) : (
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+            )}
+          </button>
           {filters.actors.length > 0 && (
             <button
               onClick={onClearActors}
-              className="text-[11px] text-slate-400 hover:text-sky-400"
+              className="text-[11px] text-slate-400 hover:text-sky-400 ml-2 shrink-0"
+              title="Deseleziona tutti gli attori"
             >
               Deseleziona ({filters.actors.length})
             </button>
           )}
         </div>
 
-        {/* Selected Actors Chips */}
-        {filters.actors.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 pb-1">
-            {filters.actors.map((a) => (
-              <span
-                key={a}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-300 border border-sky-500/50 text-xs font-medium"
-              >
-                <span className="truncate max-w-[130px]">{a}</span>
-                <button
-                  onClick={() => onToggleActor(a)}
-                  className="hover:text-white ml-0.5"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            ))}
-          </div>
-        )}
+        {showActors && (
+          <div className="space-y-2 pt-2">
+            {/* Selected Actors Chips */}
+            {filters.actors.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 pb-1">
+                {filters.actors.map((a) => (
+                  <span
+                    key={a}
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-300 border border-sky-500/50 text-xs font-medium"
+                  >
+                    <span className="truncate max-w-[130px]">{a}</span>
+                    <button
+                      onClick={() => onToggleActor(a)}
+                      className="hover:text-white ml-0.5"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
 
-        {/* Search input for actors */}
-        {sortedActors.length > 5 && (
-          <div className="relative">
-            <input
-              type="text"
-              value={actorSearch}
-              onChange={(e) => setActorSearch(e.target.value)}
-              placeholder="Filtra attori..."
-              className="w-full pl-7 pr-6 py-1 bg-slate-900/70 border border-white/[0.08] rounded-md text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
-            />
-            <Search className="w-3 h-3 text-slate-500 absolute left-2 top-2" />
-            {actorSearch && (
-              <button
-                onClick={() => setActorSearch('')}
-                className="absolute right-1.5 top-1.5 text-slate-400 hover:text-white"
-              >
-                <X className="w-3 h-3" />
-              </button>
+            {/* Search input for actors */}
+            {sortedActors.length > 5 && (
+              <div className="relative">
+                <input
+                  type="text"
+                  value={actorSearch}
+                  onChange={(e) => setActorSearch(e.target.value)}
+                  placeholder="Filtra attori..."
+                  className="w-full pl-7 pr-6 py-1 bg-slate-900/70 border border-white/[0.08] rounded-md text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                />
+                <Search className="w-3 h-3 text-slate-500 absolute left-2 top-2" />
+                {actorSearch && (
+                  <button
+                    onClick={() => setActorSearch('')}
+                    className="absolute right-1.5 top-1.5 text-slate-400 hover:text-white"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Actors List */}
+            {sortedActors.length > 0 ? (
+              <>
+                <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto pr-1 no-scrollbar">
+                  {displayedActors.map(([actor, count]) => {
+                    const isSelected = filters.actors.includes(actor);
+
+                    return (
+                      <button
+                        key={actor}
+                        onClick={() => onToggleActor(actor)}
+                        className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium border transition-all ${
+                          isSelected
+                            ? 'bg-sky-500/20 text-sky-300 border-sky-500/60 shadow-[0_0_8px_rgba(56,189,248,0.2)]'
+                            : 'bg-slate-900/60 text-slate-400 border-white/[0.06] hover:bg-slate-800/80 hover:text-slate-200'
+                        }`}
+                      >
+                        <span className="truncate max-w-[150px]">{actor}</span>
+                        <span className="text-[10px] font-mono text-slate-400">
+                          {count}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {!actorSearch && sortedActors.length > 8 && (
+                  <button
+                    onClick={() => setShowAllActors(!showAllActors)}
+                    className="text-xs text-sky-400/80 hover:text-sky-300 flex items-center gap-1 pt-0.5"
+                  >
+                    {showAllActors ? (
+                      <>
+                        <ChevronUp className="w-3 h-3" /> Mostra meno attori
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="w-3 h-3" /> Mostra tutti gli attori ({sortedActors.length})
+                      </>
+                    )}
+                  </button>
+                )}
+              </>
+            ) : (
+              <p className="text-xs text-slate-500 italic py-0.5">
+                Nessun metadato attori nel catalogo
+              </p>
             )}
           </div>
         )}
+      </div>
 
-        {/* Actors List */}
-        {sortedActors.length > 0 ? (
-          <>
-            <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto pr-1 no-scrollbar">
-              {displayedActors.map(([actor, count]) => {
-                const isSelected = filters.actors.includes(actor);
+      {/* Resolution Filter */}
+      <div className="pt-2 border-t border-white/[0.08]">
+        <div className="flex items-center justify-between py-1.5">
+          <button
+            type="button"
+            onClick={() => setShowResolutions(!showResolutions)}
+            className="flex-1 flex items-center justify-between text-xs font-semibold text-slate-300 hover:text-white"
+          >
+            <span className="flex items-center gap-1.5">
+              <Monitor className="w-3.5 h-3.5 text-sky-400" />
+              Risoluzione Video
+              {filters.resolutions.length > 0 && (
+                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                  {filters.resolutions.length}
+                </span>
+              )}
+            </span>
+            {showResolutions ? (
+              <ChevronUp className="w-3.5 h-3.5 text-slate-400" />
+            ) : (
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+            )}
+          </button>
+          {filters.resolutions.length > 0 && (
+            <button
+              onClick={() => filters.resolutions.forEach(r => onToggleResolution(r))}
+              className="text-[11px] text-slate-400 hover:text-amber-400 ml-2 shrink-0"
+              title="Deseleziona risoluzioni"
+            >
+              Deseleziona
+            </button>
+          )}
+        </div>
+
+        {showResolutions && (
+          <div className="pt-2">
+            <div className="grid grid-cols-2 gap-1.5">
+              {RESOLUTION_OPTIONS.map((res) => {
+                const count = facetCounts.resolutions[res] || 0;
+                const isSelected = filters.resolutions.includes(res);
 
                 return (
                   <button
-                    key={actor}
-                    onClick={() => onToggleActor(actor)}
-                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium border transition-all ${
+                    key={res}
+                    onClick={() => onToggleResolution(res)}
+                    className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                       isSelected
-                        ? 'bg-sky-500/20 text-sky-300 border-sky-500/60 shadow-[0_0_8px_rgba(56,189,248,0.2)]'
+                        ? 'bg-sky-500/20 text-sky-300 border-sky-500/60 shadow-[0_0_10px_rgba(56,189,248,0.2)]'
                         : 'bg-slate-900/60 text-slate-400 border-white/[0.06] hover:bg-slate-800/80 hover:text-slate-200'
                     }`}
                   >
-                    <span className="truncate max-w-[150px]">{actor}</span>
-                    <span className="text-[10px] font-mono text-slate-400">
+                    <span className="truncate">{res}</span>
+                    <span className="text-[10px] font-mono text-slate-400 ml-1">
                       {count}
                     </span>
                   </button>
                 );
               })}
             </div>
-
-            {!actorSearch && sortedActors.length > 8 && (
-              <button
-                onClick={() => setShowAllActors(!showAllActors)}
-                className="text-xs text-sky-400/80 hover:text-sky-300 flex items-center gap-1 pt-0.5"
-              >
-                {showAllActors ? (
-                  <>
-                    <ChevronUp className="w-3 h-3" /> Mostra meno attori
-                  </>
-                ) : (
-                  <>
-                    <ChevronDown className="w-3 h-3" /> Mostra tutti gli attori ({sortedActors.length})
-                  </>
-                )}
-              </button>
-            )}
-          </>
-        ) : (
-          <p className="text-xs text-slate-500 italic py-0.5">
-            Nessun metadato attori nel catalogo
-          </p>
+          </div>
         )}
-      </div>
-
-      {/* Resolution Filter */}
-      <div className="space-y-2 pt-2 border-t border-white/[0.08]">
-        <div className="flex items-center justify-between">
-          <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-            <Monitor className="w-3.5 h-3.5 text-sky-400" />
-            Risoluzione Video
-          </label>
-          {filters.resolutions.length > 0 && (
-            <button
-              onClick={() => filters.resolutions.forEach(r => onToggleResolution(r))}
-              className="text-[11px] text-slate-400 hover:text-amber-400"
-            >
-              Deseleziona
-            </button>
-          )}
-        </div>
-        <div className="grid grid-cols-2 gap-1.5">
-          {RESOLUTION_OPTIONS.map((res) => {
-            const count = facetCounts.resolutions[res] || 0;
-            const isSelected = filters.resolutions.includes(res);
-
-            return (
-              <button
-                key={res}
-                onClick={() => onToggleResolution(res)}
-                className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                  isSelected
-                    ? 'bg-sky-500/20 text-sky-300 border-sky-500/60 shadow-[0_0_10px_rgba(56,189,248,0.2)]'
-                    : 'bg-slate-900/60 text-slate-400 border-white/[0.06] hover:bg-slate-800/80 hover:text-slate-200'
-                }`}
-              >
-                <span className="truncate">{res}</span>
-                <span className="text-[10px] font-mono text-slate-400 ml-1">
-                  {count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
       </div>
 
       {/* Advanced Codec Filters Toggle */}
@@ -581,6 +787,11 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           <span className="flex items-center gap-1.5">
             <Film className="w-3.5 h-3.5 text-indigo-400" />
             Specifiche Codec Audio/Video
+            {(filters.videoCodecs.length > 0 || filters.audioCodecs.length > 0) && (
+              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                {filters.videoCodecs.length + filters.audioCodecs.length}
+              </span>
+            )}
           </span>
           {showAdvanced ? (
             <ChevronUp className="w-3.5 h-3.5 text-slate-400" />

@@ -63,24 +63,24 @@ export const MediaTable: React.FC<MediaTableProps> = ({
       </div>
 
       <div className="overflow-x-auto rounded-xl border border-white/[0.08] bg-[#111622]/90 shadow-xl">
-        <table className="w-full min-w-[580px] lg:min-w-0 text-left text-xs border-collapse table-fixed">
+        <table className="w-full min-w-[650px] lg:min-w-0 text-left text-xs border-collapse table-fixed">
           <thead>
             <tr className="border-b border-white/[0.08] bg-slate-900/90 text-slate-400 uppercase text-[11px] font-semibold tracking-wider select-none">
               <th
                 onClick={() => onSortChange('titolo')}
-                className="w-[36%] min-w-[200px] group py-3.5 px-4 cursor-pointer hover:text-white transition-colors"
+                className="w-auto lg:w-[36%] min-w-[200px] group py-3.5 px-4 cursor-pointer hover:text-white transition-colors"
               >
                 <div className="flex items-center min-w-0">
                   <span>Titolo / Opera</span>
                   {renderSortIndicator('titolo')}
                 </div>
               </th>
-              <th className="w-[8%] min-w-[90px] py-3.5 px-2 text-center whitespace-nowrap">
+              <th className="w-[95px] lg:w-[8%] py-3.5 px-2 text-center whitespace-nowrap">
                 Tipo
               </th>
               <th
                 onClick={() => onSortChange('anno')}
-                className="w-[7%] min-w-[75px] group py-3.5 px-2 cursor-pointer hover:text-white transition-colors text-center whitespace-nowrap"
+                className="w-[75px] lg:w-[7%] group py-3.5 px-2 cursor-pointer hover:text-white transition-colors text-center whitespace-nowrap"
               >
                 <div className="flex items-center justify-center">
                   <span>Anno</span>
@@ -89,19 +89,19 @@ export const MediaTable: React.FC<MediaTableProps> = ({
               </th>
               <th
                 onClick={() => onSortChange('regista')}
-                className="w-[18%] min-w-[120px] group py-3.5 px-3 cursor-pointer hover:text-white transition-colors"
+                className="w-[130px] lg:w-[18%] group py-3.5 px-3 cursor-pointer hover:text-white transition-colors"
               >
                 <div className="flex items-center">
                   <span>Regista</span>
                   {renderSortIndicator('regista')}
                 </div>
               </th>
-              <th className="w-[10%] min-w-[95px] py-3.5 px-2 text-center whitespace-nowrap hidden md:table-cell">
+              <th className="w-[100px] lg:w-[10%] py-3.5 px-2 text-center whitespace-nowrap hidden md:table-cell">
                 Risoluzione
               </th>
               <th
                 onClick={() => onSortChange('durata_min')}
-                className="w-[11%] min-w-[100px] group py-3.5 px-3 cursor-pointer hover:text-white transition-colors whitespace-nowrap"
+                className="w-[145px] lg:w-[11%] group py-3.5 px-2.5 cursor-pointer hover:text-white transition-colors whitespace-nowrap"
               >
                 <div className="flex items-center">
                   <span>Durata / Ep.</span>
@@ -110,7 +110,7 @@ export const MediaTable: React.FC<MediaTableProps> = ({
               </th>
               <th
                 onClick={() => onSortChange('dimensione_gb')}
-                className="w-[10%] min-w-[90px] group py-3.5 px-3 cursor-pointer hover:text-white transition-colors whitespace-nowrap hidden lg:table-cell"
+                className="w-[100px] lg:w-[10%] group py-3.5 px-3 cursor-pointer hover:text-white transition-colors whitespace-nowrap hidden lg:table-cell"
               >
                 <div className="flex items-center">
                   <span>Dimensione</span>
@@ -202,9 +202,9 @@ export const MediaTable: React.FC<MediaTableProps> = ({
                   </td>
 
                   {/* Duration */}
-                  <td className="py-2.5 px-3 font-mono whitespace-nowrap text-slate-400 overflow-hidden">
+                  <td className="py-2.5 px-2.5 font-mono whitespace-nowrap text-slate-400 overflow-hidden">
                     {isSeries ? (
-                      <span title={`${item.numero_episodi} episodi`}>
+                      <span title={`${item.numero_episodi} episodi (${formatDuration(item.durata_min)})`}>
                         {item.numero_episodi} ep ({formatDuration(item.durata_min)})
                       </span>
                     ) : (

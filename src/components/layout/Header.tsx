@@ -7,7 +7,9 @@ import {
   HardDrive,
   Clock,
   Layers,
-  AlertTriangle
+  AlertTriangle,
+  Search,
+  X
 } from 'lucide-react';
 import { CatalogStats, MediaSection, ViewMode, SortField, SortDirection } from '../../types/catalog';
 import { formatStorage } from '../../utils/formatters';
@@ -30,6 +32,8 @@ interface HeaderProps {
   sortBy?: SortField;
   sortDirection?: SortDirection;
   onSortChange?: (field: SortField, direction?: SortDirection) => void;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -48,7 +52,9 @@ export const Header: React.FC<HeaderProps> = ({
   isFiltered,
   sortBy,
   sortDirection,
-  onSortChange
+  onSortChange,
+  searchQuery,
+  onSearchChange
 }) => {
   const isAllSelected = activeSections.length === 0;
 
@@ -124,10 +130,10 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         )}
 
-        {/* Section Tabs Quick Selector & View Controls Bar */}
+        {/* Section Tabs Quick Selector (Desktop) & Mobile Search Bar */}
         <div className="py-2.5 flex items-center justify-between gap-3 min-w-0">
           {stats && (
-            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 min-w-0">
+            <div className="hidden lg:flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 min-w-0">
               <button
                 onClick={onSelectAllSections}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0 ${
@@ -204,6 +210,28 @@ export const Header: React.FC<HeaderProps> = ({
                   {stats.totalCartoons}
                 </span>
               </button>
+            </div>
+          )}
+
+          {/* Mobile Search Bar (occupies the section tabs space on mobile) */}
+          {onSearchChange && (
+            <div className="flex-1 min-w-0 lg:hidden relative">
+              <input
+                type="text"
+                value={searchQuery || ''}
+                onChange={(e) => onSearchChange(e.target.value)}
+                placeholder="Cerca per titolo, cast..."
+                className="w-full pl-8 pr-7 py-1.5 bg-slate-900/90 border border-white/[0.1] rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
+              />
+              <Search className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5" />
+              {searchQuery && (
+                <button
+                  onClick={() => onSearchChange('')}
+                  className="absolute right-2 top-2 text-slate-400 hover:text-white"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
           )}
 

@@ -350,8 +350,9 @@ Per estrarre i metadati completi:
 - **Schermi Compatti & Mobile (< 1024px e < 768px)**:
   - Eliminare la colonna `Dimensione` sotto i 1024px (`hidden lg:table-cell`).
   - Eliminare la colonna `Risoluzione` su mobile sotto i 768px (`hidden md:table-cell`).
-  - Proteggere i badge di Tipo e Anno con `min-w-[90px]` e `min-w-[75px]` per evitare qualsiasi taglio.
-  - Tabella con `min-w-[580px] lg:min-w-0` e scorrimento orizzontale nativo (`overflow-x-auto`). Mai usare `touch-pan-x` sul wrapper della tabella poiché disabilita lo scorrimento verticale della pagina sui dispositivi touch.
+  - Proteggere i badge di Tipo (`w-[95px] lg:w-[8%]`) e Anno (`w-[75px] lg:w-[7%]`) con larghezze fisse dedicate su mobile.
+  - Colonna **Durata / Ep.** con `w-[145px] lg:w-[11%]` su mobile per garantire spazio sufficiente a combinazioni estese come `279 ep (45h 22m)` senza alcun troncamento.
+  - Tabella con `min-w-[650px] lg:min-w-0` e scorrimento orizzontale nativo (`overflow-x-auto`). Mai usare `touch-pan-x` sul wrapper della tabella poiché disabilita lo scorrimento verticale della pagina sui dispositivi touch.
 
 ### 7.2 Scheda Dettaglio (`MediaDetailDrawer.tsx`)
 - **Iconografia Coerente**: Icone dedicate accanto alle etichette (`Tag` per generi, `FileText` per sinossi, `Clapperboard` per regista, `Users` per cast).
@@ -363,7 +364,19 @@ Per estrarre i metadati completi:
 ### 7.3 Badge e Componenti Comuni (`Badge.tsx`)
 - Tutti i badge includono obbligatoriamente `whitespace-nowrap shrink-0 justify-center`.
 
-### 7.4 Workflow e Rilasci
+### 7.4 Pannello Filtri & Drawer Mobile (`FilterSidebar.tsx` & `Header.tsx`)
+- **Responsive Mobile (< 1024px)**:
+  - Barra di ricerca spostata nell'Header (`Header.tsx`) a fianco dei controlli vista/filtri (`lg:hidden`).
+  - Ricerca nascosta nel drawer filtri mobile (`hidden lg:block`).
+  - Selettore di libreria (*Tutti i Media, Film, Serie TV, Anime, Cartoni*) integrato in cima al drawer filtri mobile.
+  - **Wrap senza scroll orizzontale**: Il selettore libreria mobile non usa scroll orizzontale, ma `flex flex-wrap items-center gap-1.5 py-0.5` permettendo a tutti i bottoni di andare a capo in modo armonioso.
+- **Categorie di Filtro Collassabili (Desktop & Mobile)**:
+  - `Generi e Categorie`, `Regia / Regista`, `Attori Principali`, `Risoluzione Video`, `Specifiche Codec Audio/Video` sono collassabili sia su desktop che su mobile.
+  - **Su Mobile**: Tutte le categorie sono collassate di default all'apertura del drawer (`isMobileOpen`).
+  - **Su Desktop**: Le categorie principali partono aperte, con `Specifiche Codec` collassata di default. L'utente desktop può collassare/espandere qualsiasi sezione in qualsiasi momento.
+  - Ogni header mostra chevron reattiva, badge numerico con elementi attivi e pulsante contestuale `Deseleziona`.
+
+### 7.5 Workflow e Rilasci
 - Sviluppare e verificare sempre in locale (`http://localhost:5173/`).
 - **Nessun commit o push automatico su Git senza richiesta esplicita dell'utente.**
 
