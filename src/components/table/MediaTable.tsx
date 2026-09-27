@@ -62,7 +62,7 @@ export const MediaTable: React.FC<MediaTableProps> = ({
         </span>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-white/[0.08] bg-[#111622]/90 shadow-xl touch-pan-x">
+      <div className="overflow-x-auto rounded-xl border border-white/[0.08] bg-[#111622]/90 shadow-xl">
         <table className="w-full min-w-[700px] lg:min-w-0 text-left text-xs border-collapse table-fixed">
           <thead>
             <tr className="border-b border-white/[0.08] bg-slate-900/90 text-slate-400 uppercase text-[11px] font-semibold tracking-wider select-none">
