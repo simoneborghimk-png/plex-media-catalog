@@ -333,6 +333,38 @@ Per estrarre i metadati completi:
 - Sia l'assistente AI sia l'interfaccia utente (tramite badge e banner in `Header.tsx`) verificano se `daysSinceUpdate > 7`:
   - Se i dati superano i 7 giorni, viene mostrato un avviso esplicito che invita l'utente a rilanciare `export_plex.py` sul server Plex.
 
+---
+
+## 7. Linee Guida di Design, UX & Standard Visivi
+
+### 7.1 Vista Tabellare (`MediaTable.tsx`)
+- **Proporzioni Desktop (Somma esatta 100%)**:
+  - `Titolo / Opera`: `w-[36%] min-w-[200px]` (colonna dominante per titoli lunghi e titoli originali).
+  - `Tipo`: `w-[8%] min-w-[90px]` (badge centrato).
+  - `Anno`: `w-[7%] min-w-[75px]` (anno centrato).
+  - `Regista`: `w-[18%] min-w-[120px]` (spazio bilanciato per nomi).
+  - `Risoluzione`: `w-[10%] min-w-[95px]` (badge centrato).
+  - `Durata / Ep.`: `w-[11%] min-w-[100px]`.
+  - `Dimensione`: `w-[10%] min-w-[90px]`.
+- **Regola tecnica**: Mai usare funzioni inline `max(...)` nei tag di tabella `table-fixed` (i motori di rendering le scartano forzando larghezze uguali al 14%); usare sempre classi Tailwind percentuali con `min-w`.
+- **Schermi Compatti & Mobile (< 1024px)**:
+  - Eliminare la colonna `Dimensione` (`hidden lg:table-cell`).
+  - Proteggere i badge di Tipo e Anno con `min-w-[90px]` e `min-w-[75px]` per evitare qualsiasi taglio.
+  - Tabella con `min-w-[700px] lg:min-w-0` e scorrimento orizzontale touch (`touch-pan-x`).
+
+### 7.2 Scheda Dettaglio (`MediaDetailDrawer.tsx`)
+- **Iconografia Coerente**: Icone dedicate accanto alle etichette (`Tag` per generi, `FileText` per sinossi, `Clapperboard` per regista, `Users` per cast).
+- **Generi**: Riga orizzontale scrollabile a chip compatti (`no-scrollbar flex gap-1.5 overflow-x-auto whitespace-nowrap`).
+- **Pulizia Badge**: Nessun prefisso ridondante ("Storage:", "Totale:"); mostrare solo il valore pulito (`11.35 GB`, `45h 22m`).
+- **Allineamento**: Durata e dimensione allineate a destra sulla stessa riga (`ml-auto flex items-center gap-2`).
+- **Serie TV vs Film**: Nelle serie TV nascondere le specifiche tecniche globali e mostrarle nell'accordion delle stagioni (`SeasonAccordion.tsx`) suddivise in 3 card (Video, Audio, Sottotitoli). Accorpare stagioni ed episodi sotto il titolo (es. `11 Stagioni • 279 episodi`).
+
+### 7.3 Badge e Componenti Comuni (`Badge.tsx`)
+- Tutti i badge includono obbligatoriamente `whitespace-nowrap shrink-0 justify-center`.
+
+### 7.4 Workflow e Rilasci
+- Sviluppare e verificare sempre in locale (`http://localhost:5173/`).
+- **Nessun commit o push automatico su Git senza richiesta esplicita dell'utente.**
 
 ---
-*Fine delle linee guida architetturali. Proseguire con la FASE 2: Implementazione del Progetto.*
+*Fine delle linee guida architetturali e di design.*
