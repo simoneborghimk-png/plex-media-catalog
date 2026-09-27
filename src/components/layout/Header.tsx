@@ -69,10 +69,6 @@ export const Header: React.FC<HeaderProps> = ({
                 <h1 className="text-lg font-bold text-white tracking-tight">
                   Plex Media Catalog
                 </h1>
-                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse mr-1"></span>
-                  Locale
-                </span>
               </div>
               <p className="text-xs text-slate-400">
                 Archivio multimediale e specifiche tecniche
