@@ -204,8 +204,8 @@ export const MediaTable: React.FC<MediaTableProps> = ({
                   {/* Duration */}
                   <td className="py-2.5 px-2.5 font-mono whitespace-nowrap text-slate-400 overflow-hidden">
                     {isSeries ? (
-                      <span title={`${item.numero_episodi} episodi (${formatDuration(item.durata_min)})`}>
-                        {item.numero_episodi} ep ({formatDuration(item.durata_min)})
+                      <span title={`${item.numero_episodi} episodi (${formatDuration(item.durata_totale_min)})`}>
+                        {item.numero_episodi} ep ({formatDuration(item.durata_totale_min)})
                       </span>
                     ) : (
                       formatDuration(item.durata_min)
