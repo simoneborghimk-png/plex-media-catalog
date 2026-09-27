@@ -347,9 +347,11 @@ Per estrarre i metadati completi:
   - `Durata / Ep.`: `w-[11%] min-w-[100px]`.
   - `Dimensione`: `w-[10%] min-w-[90px]`.
 - **Regola tecnica**: Mai usare funzioni inline `max(...)` nei tag di tabella `table-fixed` (i motori di rendering le scartano forzando larghezze uguali al 14%); usare sempre classi Tailwind percentuali con `min-w`.
-- **Schermi Compatti & Mobile (< 1024px)**:
-  - Eliminare la colonna `Dimensione` (`hidden lg:table-cell`).
-  - Tabella con `min-w-[700px] lg:min-w-0` e scorrimento orizzontale nativo (`overflow-x-auto`). Mai usare `touch-pan-x` sul wrapper della tabella poiché disabilita lo scorrimento verticale della pagina sui dispositivi touch.
+- **Schermi Compatti & Mobile (< 1024px e < 768px)**:
+  - Eliminare la colonna `Dimensione` sotto i 1024px (`hidden lg:table-cell`).
+  - Eliminare la colonna `Risoluzione` su mobile sotto i 768px (`hidden md:table-cell`).
+  - Proteggere i badge di Tipo e Anno con `min-w-[90px]` e `min-w-[75px]` per evitare qualsiasi taglio.
+  - Tabella con `min-w-[580px] lg:min-w-0` e scorrimento orizzontale nativo (`overflow-x-auto`). Mai usare `touch-pan-x` sul wrapper della tabella poiché disabilita lo scorrimento verticale della pagina sui dispositivi touch.
 
 ### 7.2 Scheda Dettaglio (`MediaDetailDrawer.tsx`)
 - **Iconografia Coerente**: Icone dedicate accanto alle etichette (`Tag` per generi, `FileText` per sinossi, `Clapperboard` per regista, `Users` per cast).

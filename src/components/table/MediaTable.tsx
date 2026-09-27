@@ -63,7 +63,7 @@ export const MediaTable: React.FC<MediaTableProps> = ({
       </div>
 
       <div className="overflow-x-auto rounded-xl border border-white/[0.08] bg-[#111622]/90 shadow-xl">
-        <table className="w-full min-w-[700px] lg:min-w-0 text-left text-xs border-collapse table-fixed">
+        <table className="w-full min-w-[580px] lg:min-w-0 text-left text-xs border-collapse table-fixed">
           <thead>
             <tr className="border-b border-white/[0.08] bg-slate-900/90 text-slate-400 uppercase text-[11px] font-semibold tracking-wider select-none">
               <th
@@ -96,7 +96,7 @@ export const MediaTable: React.FC<MediaTableProps> = ({
                   {renderSortIndicator('regista')}
                 </div>
               </th>
-              <th className="w-[10%] min-w-[95px] py-3.5 px-2 text-center whitespace-nowrap">
+              <th className="w-[10%] min-w-[95px] py-3.5 px-2 text-center whitespace-nowrap hidden md:table-cell">
                 Risoluzione
               </th>
               <th
@@ -194,8 +194,8 @@ export const MediaTable: React.FC<MediaTableProps> = ({
                     )}
                   </td>
 
-                  {/* Resolution */}
-                  <td className="py-2.5 px-2 whitespace-nowrap text-center">
+                  {/* Resolution (hidden on mobile < md) */}
+                  <td className="py-2.5 px-2 whitespace-nowrap text-center hidden md:table-cell">
                     <div className="flex items-center justify-center">
                       <ResolutionBadge resolution={item.risoluzione} />
                     </div>
