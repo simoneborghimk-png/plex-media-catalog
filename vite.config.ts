@@ -16,7 +16,7 @@ export default defineConfig(({ command }) => {
     plugins: [
       react(),
       {
-        name: 'serve-data-directory',
+        name: 'serve-data-and-posters-directory',
         configureServer(server) {
           server.middlewares.use((req: any, res: any, next: any) => {
             if (req.url && req.url.includes('/data/')) {
@@ -34,6 +34,20 @@ export default defineConfig(({ command }) => {
                 return;
               }
             }
+
+            if (req.url && req.url.includes('/posters/')) {
+              const urlParts = req.url.split('/posters/');
+              const relativePath = 'public/posters/' + decodeURIComponent(urlParts[1].split('?')[0]);
+              const filePath = path.resolve(__dirname, relativePath);
+              if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+                res.setHeader('Content-Type', 'image/webp');
+                res.setHeader('Cache-Control', 'public, max-age=3600');
+                res.setHeader('Access-Control-Allow-Origin', '*');
+                fs.createReadStream(filePath).pipe(res);
+                return;
+              }
+            }
+
             next();
           });
         },

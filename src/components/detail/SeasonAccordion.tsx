@@ -4,11 +4,12 @@ import {
   ChevronDown,
   ChevronRight,
   Clock,
-  HardDrive
+  HardDrive,
+  FileText
 } from 'lucide-react';
 import { RawSeasonItem, RawEpisodeItem } from '../../types/catalog';
 import { ResolutionBadge, CodecBadge } from '../common/Badge';
-import { formatDuration, formatStorage, formatChannels } from '../../utils/formatters';
+import { formatDuration, formatStorage, formatChannels, cleanCodec } from '../../utils/formatters';
 
 interface SeasonAccordionProps {
   seasons: RawSeasonItem[];
@@ -118,38 +119,50 @@ export const SeasonAccordion: React.FC<SeasonAccordionProps> = ({ seasons }) => 
                       </p>
                     )}
 
-                    {/* Technical details grid */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-white/[0.04] text-[11px]">
-                      <div className="bg-slate-900/60 p-2 rounded-lg border border-white/[0.04]">
-                        <span className="text-slate-500 block">Video</span>
-                        <div className="flex items-center gap-1 mt-0.5 font-mono text-slate-200">
+                    {/* Specifiche Tecniche Episodio - 3 schede compatte */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-2.5 border-t border-white/[0.06] text-xs">
+                      {/* Flusso Video */}
+                      <div className="bg-[#141a29]/90 p-2.5 rounded-lg border border-white/[0.06] space-y-1.5">
+                        <div className="flex items-center justify-between text-[11px] text-slate-400">
+                          <span>Flusso Video</span>
                           <CodecBadge codec={ep.codec_video} type="video" />
-                          <span>{ep.larghezza}x{ep.altezza}</span>
+                        </div>
+                        <div className="text-xs font-bold text-white font-mono">
+                          {ep.larghezza && ep.altezza ? `${ep.larghezza} × ${ep.altezza} px` : ep.risoluzione}
+                        </div>
+                        <div className="text-[11px] text-slate-400">
+                          Codec: <span className="text-slate-200 font-medium">{cleanCodec(ep.codec_video)}</span>
                         </div>
                       </div>
 
-                      <div className="bg-slate-900/60 p-2 rounded-lg border border-white/[0.04]">
-                        <span className="text-slate-500 block">Audio</span>
-                        <div className="flex items-center gap-1 mt-0.5 font-mono text-slate-200">
+                      {/* Flusso Audio */}
+                      <div className="bg-[#141a29]/90 p-2.5 rounded-lg border border-white/[0.06] space-y-1.5">
+                        <div className="flex items-center justify-between text-[11px] text-slate-400">
+                          <span>Flusso Audio</span>
                           <CodecBadge codec={ep.codec_audio} type="audio" />
-                          <span>{formatChannels(ep.canali_audio)}</span>
+                        </div>
+                        <div className="text-xs font-bold text-white font-mono">
+                          {formatChannels(ep.canali_audio) || ep.codec_audio}
+                        </div>
+                        <div className="text-[11px] text-slate-400 truncate" title={ep.tracce_audio}>
+                          Tracce: <span className="text-slate-200">{ep.tracce_audio || 'N/D'}</span>
                         </div>
                       </div>
 
-                      <div className="bg-slate-900/60 p-2 rounded-lg border border-white/[0.04] col-span-2">
-                        <span className="text-slate-500 block">Tracce Audio</span>
-                        <span className="text-slate-300 truncate block mt-0.5" title={ep.tracce_audio}>
-                          {ep.tracce_audio || 'N/D'}
-                        </span>
+                      {/* Sottotitoli */}
+                      <div className="bg-[#141a29]/90 p-2.5 rounded-lg border border-white/[0.06] space-y-1.5">
+                        <div className="flex items-center justify-between text-[11px] text-slate-400">
+                          <span>Sottotitoli</span>
+                          <FileText className="w-3.5 h-3.5 text-amber-400" />
+                        </div>
+                        <div className="text-xs font-bold text-white">
+                          {ep.sottotitoli ? 'Disponibili' : 'Nessuno'}
+                        </div>
+                        <div className="text-[11px] text-slate-400 truncate" title={ep.sottotitoli}>
+                          Streams: <span className="text-slate-200">{ep.sottotitoli || 'Nessun sottotitolo rilevato'}</span>
+                        </div>
                       </div>
                     </div>
-
-                    {/* Sottotitoli */}
-                    {ep.sottotitoli && (
-                      <div className="text-[11px] text-slate-400">
-                        <span className="text-slate-500">Sottotitoli:</span> {ep.sottotitoli}
-                      </div>
-                    )}
 
 
                   </div>
