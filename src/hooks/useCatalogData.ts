@@ -130,9 +130,10 @@ export function useCatalogData(): UseCatalogDataResult {
             canali_audio: film.canali_audio,
             tracce_audio: film.tracce_audio || '',
             sottotitoli: film.sottotitoli || '',
-            file_path: film.file_path || '',
             numero_stagioni: 0,
             numero_episodi: 0,
+            poster: film.poster,
+            has_poster: film.has_poster,
             searchTokens: tokens
           });
         });
@@ -244,6 +245,8 @@ export function useCatalogData(): UseCatalogDataResult {
               numero_stagioni: seasons.length,
               numero_episodi: episodeCount,
               stagioni: seasons,
+              poster: series.poster,
+              has_poster: series.has_poster,
               searchTokens: tokens
             });
           });

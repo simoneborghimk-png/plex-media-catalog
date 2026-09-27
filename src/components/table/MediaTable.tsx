@@ -1,10 +1,11 @@
-import React from 'react';
 import {
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
-  ChevronLeft,
-  ChevronRight
+  Film,
+  Tv,
+  Sparkles,
+  Smile
 } from 'lucide-react';
 import {
   UnifiedMediaItem,
@@ -12,7 +13,9 @@ import {
   SortDirection
 } from '../../types/catalog';
 import { ResolutionBadge, SectionBadge } from '../common/Badge';
+import { Pagination } from '../common/Pagination';
 import { formatDuration, formatStorage } from '../../utils/formatters';
+import { getPosterUrl } from '../../utils/poster';
 
 interface MediaTableProps {
   items: UnifiedMediaItem[];
@@ -22,6 +25,7 @@ interface MediaTableProps {
   currentPage: number;
   totalPages: number;
   totalFilteredCount: number;
+  itemsPerPage: number;
   onPageChange: (page: number) => void;
   onSelectItem: (item: UnifiedMediaItem) => void;
 }
@@ -34,6 +38,7 @@ export const MediaTable: React.FC<MediaTableProps> = ({
   currentPage,
   totalPages,
   totalFilteredCount,
+  itemsPerPage,
   onPageChange,
   onSelectItem
 }) => {
@@ -51,22 +56,22 @@ export const MediaTable: React.FC<MediaTableProps> = ({
   return (
     <div className="space-y-4">
       <div className="overflow-x-auto rounded-xl border border-white/[0.08] bg-[#111622]/90 shadow-xl">
-        <table className="w-full text-left text-xs border-collapse">
+        <table className="w-full text-left text-xs border-collapse table-fixed">
           <thead>
             <tr className="border-b border-white/[0.08] bg-slate-900/90 text-slate-400 uppercase text-[11px] font-semibold tracking-wider select-none">
               <th
                 onClick={() => onSortChange('titolo')}
-                className="group py-3.5 px-4 cursor-pointer hover:text-white transition-colors"
+                className="w-[36%] group py-3.5 px-4 cursor-pointer hover:text-white transition-colors"
               >
                 <div className="flex items-center">
                   <span>Titolo / Opera</span>
                   {renderSortIndicator('titolo')}
                 </div>
               </th>
-              <th className="py-3.5 px-3">Tipo</th>
+              <th className="w-[8%] py-3.5 px-3">Tipo</th>
               <th
                 onClick={() => onSortChange('anno')}
-                className="group py-3.5 px-3 cursor-pointer hover:text-white transition-colors"
+                className="w-[7%] group py-3.5 px-3 cursor-pointer hover:text-white transition-colors"
               >
                 <div className="flex items-center">
                   <span>Anno</span>
@@ -75,17 +80,17 @@ export const MediaTable: React.FC<MediaTableProps> = ({
               </th>
               <th
                 onClick={() => onSortChange('regista')}
-                className="group py-3.5 px-3 cursor-pointer hover:text-white transition-colors"
+                className="w-[18%] group py-3.5 px-3 cursor-pointer hover:text-white transition-colors"
               >
                 <div className="flex items-center">
                   <span>Regista</span>
                   {renderSortIndicator('regista')}
                 </div>
               </th>
-              <th className="py-3.5 px-3">Risoluzione</th>
+              <th className="w-[10%] py-3.5 px-3">Risoluzione</th>
               <th
                 onClick={() => onSortChange('durata_min')}
-                className="group py-3.5 px-3 cursor-pointer hover:text-white transition-colors"
+                className="w-[11%] group py-3.5 px-3 cursor-pointer hover:text-white transition-colors"
               >
                 <div className="flex items-center">
                   <span>Durata / Ep.</span>
@@ -94,7 +99,7 @@ export const MediaTable: React.FC<MediaTableProps> = ({
               </th>
               <th
                 onClick={() => onSortChange('dimensione_gb')}
-                className="group py-3.5 px-3 cursor-pointer hover:text-white transition-colors"
+                className="w-[10%] group py-3.5 px-3 cursor-pointer hover:text-white transition-colors"
               >
                 <div className="flex items-center">
                   <span>Dimensione</span>
@@ -113,32 +118,62 @@ export const MediaTable: React.FC<MediaTableProps> = ({
                   onClick={() => onSelectItem(item)}
                   className="hover:bg-slate-800/60 cursor-pointer transition-colors group"
                 >
-                  {/* Title & Original Title */}
-                  <td className="py-3 px-4 min-w-[220px]">
-                    <div className="font-semibold text-white group-hover:text-amber-400 transition-colors">
-                      {item.titolo}
-                    </div>
-                    {item.titolo_originale && item.titolo_originale !== item.titolo && (
-                      <div className="text-[11px] text-slate-400 italic truncate max-w-xs">
-                        {item.titolo_originale}
+                  {/* Title & Original Title with Mini Poster */}
+                  <td className="py-2.5 px-4 overflow-hidden">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-7 h-10 rounded bg-slate-900 border border-white/[0.08] shrink-0 overflow-hidden relative flex items-center justify-center">
+                        {/* Placeholder Icon */}
+                        <span className="text-slate-500/80 group-hover:text-amber-400/80 transition-colors">
+                          {item.section === 'film' && <Film className="w-3.5 h-3.5 text-amber-400/60" />}
+                          {item.section === 'serie_tv' && <Tv className="w-3.5 h-3.5 text-blue-400/60" />}
+                          {item.section === 'anime' && <Sparkles className="w-3.5 h-3.5 text-rose-400/60" />}
+                          {item.section === 'cartoon' && <Smile className="w-3.5 h-3.5 text-emerald-400/60" />}
+                        </span>
+
+                        {/* Real Poster Image (overlays on top when loaded) */}
+                        <img
+                          src={getPosterUrl(item.id)}
+                          alt=""
+                          loading="lazy"
+                          className="absolute inset-0 w-full h-full object-cover object-center"
+                          onError={(e) => {
+                            (e.target as HTMLElement).style.display = 'none';
+                          }}
+                        />
                       </div>
-                    )}
+                      <div className="min-w-0 flex-1">
+                        <div
+                          className="font-semibold text-white group-hover:text-amber-400 transition-colors truncate"
+                          title={item.titolo_originale && item.titolo_originale !== item.titolo ? `${item.titolo} (${item.titolo_originale})` : item.titolo}
+                        >
+                          {item.titolo}
+                        </div>
+                        {item.titolo_originale && item.titolo_originale !== item.titolo && (
+                          <div
+                            className="text-[11px] text-slate-400 italic truncate"
+                            title={item.titolo_originale}
+                          >
+                            {item.titolo_originale}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </td>
 
                   {/* Section Badge */}
-                  <td className="py-3 px-3 whitespace-nowrap">
+                  <td className="py-3 px-3 whitespace-nowrap overflow-hidden">
                     <SectionBadge section={item.section} />
                   </td>
 
                   {/* Year */}
-                  <td className="py-3 px-3 font-mono font-medium text-slate-300 whitespace-nowrap">
+                  <td className="py-3 px-3 font-mono font-medium text-slate-300 whitespace-nowrap overflow-hidden">
                     {item.anno || '—'}
                   </td>
 
                   {/* Director */}
-                  <td className="py-3 px-3 text-slate-300 max-w-[150px] truncate" title={item.regista || undefined}>
+                  <td className="py-3 px-3 text-slate-300 overflow-hidden" title={item.regista || undefined}>
                     {item.regista ? (
-                      <span className="text-xs text-amber-200/90 font-medium truncate block">
+                      <span className="text-xs text-amber-200/90 font-medium truncate block" title={item.regista}>
                         {item.regista}
                       </span>
                     ) : (
@@ -147,12 +182,12 @@ export const MediaTable: React.FC<MediaTableProps> = ({
                   </td>
 
                   {/* Resolution */}
-                  <td className="py-3 px-3 whitespace-nowrap">
+                  <td className="py-3 px-3 whitespace-nowrap overflow-hidden">
                     <ResolutionBadge resolution={item.risoluzione} />
                   </td>
 
                   {/* Duration */}
-                  <td className="py-3 px-3 font-mono whitespace-nowrap text-slate-400">
+                  <td className="py-3 px-3 font-mono whitespace-nowrap text-slate-400 overflow-hidden">
                     {isSeries ? (
                       <span title={`${item.numero_episodi} episodi`}>
                         {item.numero_episodi} ep ({formatDuration(item.durata_min)})
@@ -163,7 +198,7 @@ export const MediaTable: React.FC<MediaTableProps> = ({
                   </td>
 
                   {/* Storage Size */}
-                  <td className="py-3 px-3 font-mono font-semibold text-slate-200 whitespace-nowrap">
+                  <td className="py-3 px-3 font-mono font-semibold text-slate-200 whitespace-nowrap overflow-hidden">
                     {formatStorage(item.dimensione_gb)}
                   </td>
                 </tr>
@@ -174,39 +209,14 @@ export const MediaTable: React.FC<MediaTableProps> = ({
       </div>
 
       {/* Pagination Bar */}
-      {totalPages > 1 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 pb-8">
-          <div className="text-xs text-slate-400">
-            Pagina <span className="font-mono font-semibold text-white">{currentPage}</span> di{' '}
-            <span className="font-mono font-semibold text-white">{totalPages}</span> (
-            <span className="font-mono text-amber-400">{totalFilteredCount}</span> elementi)
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => onPageChange(currentPage - 1)}
-              disabled={currentPage <= 1}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium border border-white/[0.08] bg-slate-900/80 text-slate-300 hover:bg-slate-800 disabled:opacity-40 disabled:pointer-events-none transition-all"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              <span>Precedente</span>
-            </button>
-
-            <span className="text-xs font-mono text-slate-300 px-2">
-              {currentPage} / {totalPages}
-            </span>
-
-            <button
-              onClick={() => onPageChange(currentPage + 1)}
-              disabled={currentPage >= totalPages}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium border border-white/[0.08] bg-slate-900/80 text-slate-300 hover:bg-slate-800 disabled:opacity-40 disabled:pointer-events-none transition-all"
-            >
-              <span>Successiva</span>
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalFilteredCount}
+        itemsPerPage={itemsPerPage}
+        currentItemsCount={items.length}
+        onPageChange={onPageChange}
+      />
     </div>
   );
 };

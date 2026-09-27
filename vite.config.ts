@@ -61,7 +61,10 @@ export default defineConfig(({ command }) => {
     server: {
       port: 5173,
       host: true,
-      open: false
+      open: false,
+      watch: {
+        ignored: ['**/public/posters/**', '**/data/**']
+      }
     }
   };
 });

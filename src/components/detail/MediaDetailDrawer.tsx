@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import {
   X,
-  Copy,
-  Check,
   Film,
+  Tv,
+  Sparkles,
+  Smile,
   HardDrive,
   Clock,
   Layers,
   Monitor,
   Volume2,
   FileText,
-  FolderOpen,
   User,
   Users,
   Clapperboard
@@ -24,7 +24,7 @@ import {
   formatChannels,
   cleanCodec
 } from '../../utils/formatters';
-import { copyToClipboard } from '../../utils/copyToClipboard';
+import { getPosterUrl } from '../../utils/poster';
 
 interface MediaDetailDrawerProps {
   item: UnifiedMediaItem | null;
@@ -39,7 +39,11 @@ export const MediaDetailDrawer: React.FC<MediaDetailDrawerProps> = ({
   onFilterByDirector,
   onFilterByActor
 }) => {
-  const [copied, setCopied] = useState(false);
+  const [imgError, setImgError] = useState(false);
+
+  useEffect(() => {
+    setImgError(false);
+  }, [item?.id]);
 
   // Close on Escape key
   useEffect(() => {
@@ -51,15 +55,6 @@ export const MediaDetailDrawer: React.FC<MediaDetailDrawerProps> = ({
   }, [onClose]);
 
   if (!item) return null;
-
-  const handleCopyPath = async () => {
-    if (!item.file_path) return;
-    const ok = await copyToClipboard(item.file_path);
-    if (ok) {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
 
   const isSeries = item.section !== 'film';
 
@@ -91,55 +86,86 @@ export const MediaDetailDrawer: React.FC<MediaDetailDrawerProps> = ({
           <div className="relative bg-gradient-to-r from-slate-900 via-amber-950/20 to-slate-900 p-6 sm:p-8 border-b border-white/[0.08]">
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 p-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.12] text-slate-400 hover:text-white transition-all border border-white/[0.08]"
+              className="absolute top-4 right-4 p-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.12] text-slate-400 hover:text-white transition-all border border-white/[0.08] z-10"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div className="flex flex-wrap items-center gap-2 mb-3">
-              <SectionBadge section={item.section} size="md" />
-              <ResolutionBadge resolution={item.risoluzione} size="md" />
-              {item.anno && (
-                <span className="px-2.5 py-1 rounded-md text-xs font-mono font-bold bg-white/[0.06] text-slate-200 border border-white/[0.08]">
-                  {item.anno}
-                </span>
-              )}
-              {isSeries && item.numero_stagioni > 0 && (
-                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-amber-500/10 text-amber-300 border border-amber-500/20">
-                  <Layers className="w-3.5 h-3.5 text-amber-400" />
-                  <span>{item.numero_stagioni} {item.numero_stagioni === 1 ? 'Stagione' : 'Stagioni'}</span>
-                  <span>({item.numero_episodi} episodi)</span>
-                </span>
-              )}
-            </div>
+            <div className="flex flex-col sm:flex-row gap-6 items-start">
+              {/* Permanent Poster Cover Slot with atmospheric placeholder */}
+              <div className="w-28 sm:w-36 aspect-[2/3] shrink-0 rounded-xl overflow-hidden shadow-2xl border border-white/[0.12] bg-[#0c101c] relative flex flex-col items-center justify-center">
+                {/* Fallback Graphic (visible while loading or if missing) */}
+                <div className="absolute inset-0 bg-gradient-to-b from-slate-800/40 via-slate-900/60 to-[#0a0d14] flex flex-col items-center justify-center p-3 text-center">
+                  <div className="w-12 h-12 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center mb-2 shadow-inner">
+                    {item.section === 'film' && <Film className="w-6 h-6 text-amber-400/80" />}
+                    {item.section === 'serie_tv' && <Tv className="w-6 h-6 text-blue-400/80" />}
+                    {item.section === 'anime' && <Sparkles className="w-6 h-6 text-rose-400/80" />}
+                    {item.section === 'cartoon' && <Smile className="w-6 h-6 text-emerald-400/80" />}
+                  </div>
+                  <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider line-clamp-1">
+                    {item.section === 'film' ? 'Film' : item.section === 'serie_tv' ? 'Serie TV' : item.section === 'anime' ? 'Anime' : 'Cartoni'}
+                  </span>
+                </div>
 
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
-              {item.titolo}
-            </h2>
-
-            {item.titolo_originale && item.titolo_originale !== item.titolo && (
-              <p className="text-sm text-slate-400 italic mt-1">
-                Titolo originale: {item.titolo_originale}
-              </p>
-            )}
-
-            {/* Quick Metrics Header */}
-            <div className="flex flex-wrap items-center gap-4 mt-4 pt-4 border-t border-white/[0.06] text-xs font-mono text-slate-300">
-              <div className="flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-amber-400" />
-                <span>
-                  {isSeries
-                    ? `Totale: ${formatDuration(item.durata_totale_min)}`
-                    : formatDuration(item.durata_min)}
-                </span>
+                {/* Real WebP Poster (overlays on top when loaded) */}
+                {!imgError && (
+                  <img
+                    src={getPosterUrl(item.id)}
+                    alt={item.titolo}
+                    onError={() => setImgError(true)}
+                    className="absolute inset-0 w-full h-full object-cover object-center"
+                  />
+                )}
               </div>
-              <div className="flex items-center gap-1.5">
-                <HardDrive className="w-4 h-4 text-sky-400" />
-                <span>Storage: {formatStorage(item.dimensione_gb)}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Film className="w-4 h-4 text-emerald-400" />
-                <span>ID Plex: #{item.id}</span>
+
+              {/* Main Info Column */}
+              <div className="flex-1 min-w-0 pr-8">
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  <SectionBadge section={item.section} size="md" />
+                  <ResolutionBadge resolution={item.risoluzione} size="md" />
+                  {item.anno && (
+                    <span className="px-2.5 py-1 rounded-md text-xs font-mono font-bold bg-white/[0.06] text-slate-200 border border-white/[0.08]">
+                      {item.anno}
+                    </span>
+                  )}
+                  {isSeries && item.numero_stagioni > 0 && (
+                    <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                      <Layers className="w-3.5 h-3.5 text-amber-400" />
+                      <span>{item.numero_stagioni} {item.numero_stagioni === 1 ? 'Stagione' : 'Stagioni'}</span>
+                      <span>({item.numero_episodi} episodi)</span>
+                    </span>
+                  )}
+                </div>
+
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
+                  {item.titolo}
+                </h2>
+
+                {item.titolo_originale && item.titolo_originale !== item.titolo && (
+                  <p className="text-sm text-slate-400 italic mt-1">
+                    Titolo originale: {item.titolo_originale}
+                  </p>
+                )}
+
+                {/* Quick Metrics Header */}
+                <div className="flex flex-wrap items-center gap-4 mt-4 pt-4 border-t border-white/[0.06] text-xs font-mono text-slate-300">
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="w-4 h-4 text-amber-400" />
+                    <span>
+                      {isSeries
+                        ? `Totale: ${formatDuration(item.durata_totale_min)}`
+                        : formatDuration(item.durata_min)}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <HardDrive className="w-4 h-4 text-sky-400" />
+                    <span>Storage: {formatStorage(item.dimensione_gb)}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Film className="w-4 h-4 text-emerald-400" />
+                    <span>ID Plex: #{item.id}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -337,42 +363,7 @@ export const MediaDetailDrawer: React.FC<MediaDetailDrawerProps> = ({
               </div>
             </div>
 
-            {/* Storage File Path Box with Copy Button */}
-            {item.file_path && (
-              <div className="space-y-2">
-                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                  <FolderOpen className="w-4 h-4 text-amber-400" />
-                  Percorso File su Disco Locale
-                </h4>
 
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-black/60 border border-white/[0.08]">
-                  <code className="text-xs font-mono text-amber-300 break-all select-all flex-1">
-                    {item.file_path}
-                  </code>
-
-                  <button
-                    onClick={handleCopyPath}
-                    className={`flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold shrink-0 transition-all ${
-                      copied
-                        ? 'bg-emerald-500 text-slate-950 shadow-[0_0_12px_rgba(16,185,129,0.4)]'
-                        : 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-[0_0_12px_rgba(229,160,13,0.3)]'
-                    }`}
-                  >
-                    {copied ? (
-                      <>
-                        <Check className="w-4 h-4" />
-                        <span>Percorso Copiato!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-4 h-4" />
-                        <span>Copia Percorso</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Footer Controls */}

@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import {
   Layers,
-  Copy,
-  Check,
   ChevronDown,
   ChevronRight,
   Clock,
@@ -11,7 +9,6 @@ import {
 import { RawSeasonItem, RawEpisodeItem } from '../../types/catalog';
 import { ResolutionBadge, CodecBadge } from '../common/Badge';
 import { formatDuration, formatStorage, formatChannels } from '../../utils/formatters';
-import { copyToClipboard } from '../../utils/copyToClipboard';
 
 interface SeasonAccordionProps {
   seasons: RawSeasonItem[];
@@ -19,23 +16,12 @@ interface SeasonAccordionProps {
 
 export const SeasonAccordion: React.FC<SeasonAccordionProps> = ({ seasons }) => {
   const [activeSeasonIdx, setActiveSeasonIdx] = useState(0);
-  const [copiedEpId, setCopiedEpId] = useState<number | null>(null);
   const [expandedEpId, setExpandedEpId] = useState<number | null>(null);
 
   if (!seasons || seasons.length === 0) return null;
 
   const currentSeason = seasons[activeSeasonIdx] || seasons[0];
   const episodes = currentSeason.episodi || [];
-
-  const handleCopyEpPath = async (e: React.MouseEvent, ep: RawEpisodeItem) => {
-    e.stopPropagation();
-    if (!ep.file_path) return;
-    const ok = await copyToClipboard(ep.file_path);
-    if (ok) {
-      setCopiedEpId(ep.id);
-      setTimeout(() => setCopiedEpId(null), 2000);
-    }
-  };
 
   const toggleEpisodeExpand = (id: number) => {
     setExpandedEpId(expandedEpId === id ? null : id);
@@ -87,7 +73,6 @@ export const SeasonAccordion: React.FC<SeasonAccordionProps> = ({ seasons }) => 
         <div className="divide-y divide-white/[0.06] rounded-xl border border-white/[0.08] bg-[#0c101a] overflow-hidden">
           {episodes.map((ep) => {
             const isExpanded = expandedEpId === ep.id;
-            const isCopied = copiedEpId === ep.id;
 
             return (
               <div
@@ -166,34 +151,7 @@ export const SeasonAccordion: React.FC<SeasonAccordionProps> = ({ seasons }) => 
                       </div>
                     )}
 
-                    {/* File Path + Copy (se presente) */}
-                    {ep.file_path && (
-                      <div className="flex items-center justify-between gap-2 p-2 rounded-lg bg-black/40 border border-white/[0.06] font-mono text-[11px]">
-                        <span className="truncate text-slate-400" title={ep.file_path}>
-                          {ep.file_path}
-                        </span>
-                        <button
-                          onClick={(e) => handleCopyEpPath(e, ep)}
-                          className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs shrink-0 font-medium transition-all ${
-                            isCopied
-                              ? 'bg-emerald-500 text-slate-950 font-bold'
-                              : 'bg-white/[0.08] hover:bg-white/[0.15] text-white'
-                          }`}
-                        >
-                          {isCopied ? (
-                            <>
-                              <Check className="w-3.5 h-3.5" />
-                              <span>Copiato!</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-3.5 h-3.5" />
-                              <span>Copia File Path</span>
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    )}
+
                   </div>
                 )}
               </div>

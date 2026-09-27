@@ -9,7 +9,7 @@ import {
   Layers,
   AlertTriangle
 } from 'lucide-react';
-import { CatalogStats, MediaSection, ViewMode } from '../../types/catalog';
+import { CatalogStats, MediaSection, ViewMode, SortField, SortDirection } from '../../types/catalog';
 import { formatStorage } from '../../utils/formatters';
 import { ViewToggle } from '../grid/ViewToggle';
 
@@ -27,6 +27,9 @@ interface HeaderProps {
   isDesktopSidebarOpen?: boolean;
   onToggleDesktopSidebar?: () => void;
   isFiltered: boolean;
+  sortBy?: SortField;
+  sortDirection?: SortDirection;
+  onSortChange?: (field: SortField, direction?: SortDirection) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -42,7 +45,10 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenMobileFilters,
   isDesktopSidebarOpen = true,
   onToggleDesktopSidebar,
-  isFiltered
+  isFiltered,
+  sortBy,
+  sortDirection,
+  onSortChange
 }) => {
   const isAllSelected = activeSections.length === 0;
 
@@ -216,6 +222,9 @@ export const Header: React.FC<HeaderProps> = ({
             isDesktopSidebarOpen={isDesktopSidebarOpen}
             onToggleDesktopSidebar={onToggleDesktopSidebar}
             isFiltered={isFiltered}
+            sortBy={sortBy}
+            sortDirection={sortDirection}
+            onSortChange={onSortChange}
           />
         </div>
       </div>

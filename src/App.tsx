@@ -111,6 +111,9 @@ export const App: React.FC = () => {
         isDesktopSidebarOpen={isDesktopSidebarOpen}
         onToggleDesktopSidebar={() => setIsDesktopSidebarOpen(!isDesktopSidebarOpen)}
         isFiltered={isFiltered}
+        sortBy={filters.sortBy}
+        sortDirection={filters.sortDirection}
+        onSortChange={setSort}
       />
 
       {/* Main Split-Pane Body: Sidebar (flush left) + Media View (independent scroll) */}
@@ -150,6 +153,7 @@ export const App: React.FC = () => {
                 currentPage={filters.page}
                 totalPages={totalPages}
                 totalFilteredCount={totalFilteredCount}
+                itemsPerPage={filters.itemsPerPage}
                 onPageChange={setPage}
                 onSelectItem={setSelectedItem}
                 onResetFilters={resetFilters}
@@ -163,6 +167,7 @@ export const App: React.FC = () => {
                 currentPage={filters.page}
                 totalPages={totalPages}
                 totalFilteredCount={totalFilteredCount}
+                itemsPerPage={filters.itemsPerPage}
                 onPageChange={setPage}
                 onSelectItem={setSelectedItem}
               />

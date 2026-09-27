@@ -3,9 +3,12 @@ import {
   LayoutGrid,
   Table as TableIcon,
   SlidersHorizontal,
-  PanelLeftOpen
+  PanelLeftOpen,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react';
-import { ViewMode } from '../../types/catalog';
+import { ViewMode, SortField, SortDirection } from '../../types/catalog';
 
 export interface ViewToggleProps {
   viewMode: ViewMode;
@@ -17,6 +20,9 @@ export interface ViewToggleProps {
   isDesktopSidebarOpen?: boolean;
   onToggleDesktopSidebar?: () => void;
   isFiltered: boolean;
+  sortBy?: SortField;
+  sortDirection?: SortDirection;
+  onSortChange?: (field: SortField, direction?: SortDirection) => void;
 }
 
 export const ViewToggle: React.FC<ViewToggleProps> = ({
@@ -28,7 +34,10 @@ export const ViewToggle: React.FC<ViewToggleProps> = ({
   onOpenMobileFilters,
   isDesktopSidebarOpen = true,
   onToggleDesktopSidebar,
-  isFiltered
+  isFiltered,
+  sortBy,
+  sortDirection = 'asc',
+  onSortChange
 }) => {
   return (
     <div className="flex items-center gap-2.5 sm:gap-3 ml-auto shrink-0">
@@ -66,10 +75,35 @@ export const ViewToggle: React.FC<ViewToggleProps> = ({
         </button>
       )}
 
-      {/* Elements Count */}
-      <div className="hidden sm:block text-xs text-slate-400">
-        Trovati <span className="font-mono font-bold text-white">{totalFilteredCount}</span> elementi
-      </div>
+      {/* Grid-Only Sort Selector */}
+      {viewMode === 'grid' && sortBy && onSortChange && (
+        <div className="flex items-center gap-1.5 bg-slate-900/80 border border-white/[0.08] rounded-lg px-2 sm:px-2.5 py-1 text-xs">
+          <ArrowUpDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+          <span className="text-slate-400 hidden sm:inline">Ordina:</span>
+          <select
+            value={sortBy}
+            onChange={(e) => onSortChange(e.target.value as SortField)}
+            className="bg-transparent text-white font-medium focus:outline-none cursor-pointer text-xs"
+          >
+            <option value="titolo" className="bg-slate-900 text-white">Titolo</option>
+            <option value="anno" className="bg-slate-900 text-white">Anno</option>
+            <option value="durata_min" className="bg-slate-900 text-white">Durata</option>
+            <option value="dimensione_gb" className="bg-slate-900 text-white">Dimensione Storage</option>
+          </select>
+          <button
+            onClick={() => onSortChange(sortBy, sortDirection === 'asc' ? 'desc' : 'asc')}
+            title={sortDirection === 'asc' ? 'Crescente (clicca per Decrescente)' : 'Decrescente (clicca per Crescente)'}
+            aria-label="Inverti direzione ordinamento"
+            className="p-0.5 text-slate-400 hover:text-white transition-colors"
+          >
+            {sortDirection === 'asc' ? (
+              <ArrowUp className="w-3.5 h-3.5 text-amber-400" />
+            ) : (
+              <ArrowDown className="w-3.5 h-3.5 text-amber-400" />
+            )}
+          </button>
+        </div>
+      )}
 
       {/* Items per Page */}
       <div className="hidden md:flex items-center gap-1 bg-slate-900/80 border border-white/[0.08] rounded-lg px-2 py-1 text-xs">

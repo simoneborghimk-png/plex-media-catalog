@@ -36,6 +36,8 @@ export interface RawSeriesItem {
   generi?: string[];
   regista?: string;
   attori?: string[];
+  poster?: string;
+  has_poster?: boolean;
   stagioni: RawSeasonItem[];
 }
 
@@ -60,6 +62,8 @@ export interface RawFilmItem {
   generi?: string[];
   regista?: string;
   attori?: string[];
+  poster?: string;
+  has_poster?: boolean;
 }
 
 export interface RawCatalogMetadata {
@@ -89,6 +93,8 @@ export interface UnifiedMediaItem {
   generi: string[];
   regista: string;
   attori: string[];
+  poster?: string;
+  has_poster?: boolean;
   
   // Normalized/Aggregated properties
   durata_min: number | null;        // Film: durata / Serie: durata media o primo ep
