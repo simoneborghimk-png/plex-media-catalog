@@ -13,7 +13,7 @@ export const ResolutionBadge: React.FC<ResolutionBadgeProps> = ({ resolution, si
 
   return (
     <span
-      className={`inline-flex items-center font-semibold rounded-md border tracking-wide font-mono uppercase ${style.bg} ${style.text} ${style.border} ${style.glow || ''} ${sizeClass}`}
+      className={`inline-flex items-center justify-center font-semibold rounded-md border tracking-wide font-mono uppercase whitespace-nowrap shrink-0 ${style.bg} ${style.text} ${style.border} ${style.glow || ''} ${sizeClass}`}
     >
       {resolution || 'N/D'}
     </span>
@@ -31,7 +31,7 @@ export const SectionBadge: React.FC<SectionBadgeProps> = ({ section, size = 'sm'
 
   return (
     <span
-      className={`inline-flex items-center font-medium rounded-md border ${meta.badgeBg} ${meta.badgeText} ${meta.badgeBorder} ${sizeClass}`}
+      className={`inline-flex items-center justify-center font-medium rounded-md border whitespace-nowrap shrink-0 ${meta.badgeBg} ${meta.badgeText} ${meta.badgeBorder} ${sizeClass}`}
     >
       {meta.label}
     </span>
@@ -51,7 +51,7 @@ export const CodecBadge: React.FC<CodecBadgeProps> = ({ codec, type = 'video' })
 
   return (
     <span
-      className={`inline-flex items-center text-[10px] font-mono font-medium px-1.5 py-0.5 rounded border ${colorClass}`}
+      className={`inline-flex items-center justify-center text-[10px] font-mono font-medium px-1.5 py-0.5 rounded border whitespace-nowrap shrink-0 ${colorClass}`}
     >
       {codec}
     </span>

@@ -54,43 +54,54 @@ export const MediaTable: React.FC<MediaTableProps> = ({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="overflow-x-auto rounded-xl border border-white/[0.08] bg-[#111622]/90 shadow-xl">
-        <table className="w-full text-left text-xs border-collapse table-fixed">
+    <div className="space-y-3">
+      {/* Mobile Swipe Indicator Hint */}
+      <div className="flex items-center justify-between text-[11px] text-slate-400 px-1 sm:hidden">
+        <span className="flex items-center gap-1.5">
+          <span className="text-amber-400 font-bold">↔</span> Scorri orizzontalmente per vedere tutte le colonne
+        </span>
+      </div>
+
+      <div className="overflow-x-auto rounded-xl border border-white/[0.08] bg-[#111622]/90 shadow-xl touch-pan-x">
+        <table className="w-full min-w-[720px] lg:min-w-[850px] text-left text-xs border-collapse table-fixed">
           <thead>
             <tr className="border-b border-white/[0.08] bg-slate-900/90 text-slate-400 uppercase text-[11px] font-semibold tracking-wider select-none">
               <th
                 onClick={() => onSortChange('titolo')}
-                className="w-[36%] group py-3.5 px-4 cursor-pointer hover:text-white transition-colors"
+                className="min-w-[200px] group py-3.5 px-4 cursor-pointer hover:text-white transition-colors"
               >
-                <div className="flex items-center">
+                <div className="flex items-center min-w-0">
                   <span>Titolo / Opera</span>
                   {renderSortIndicator('titolo')}
                 </div>
               </th>
-              <th className="w-[8%] py-3.5 px-3">Tipo</th>
+              <th className="w-[100px] min-w-[100px] py-3.5 px-2 text-center whitespace-nowrap">
+                Tipo
+              </th>
               <th
                 onClick={() => onSortChange('anno')}
-                className="w-[7%] group py-3.5 px-3 cursor-pointer hover:text-white transition-colors"
+                className="w-[80px] min-w-[80px] group py-3.5 px-2 cursor-pointer hover:text-white transition-colors text-center whitespace-nowrap"
               >
-                <div className="flex items-center">
+                <div className="flex items-center justify-center">
                   <span>Anno</span>
                   {renderSortIndicator('anno')}
                 </div>
               </th>
               <th
                 onClick={() => onSortChange('regista')}
-                className="w-[18%] group py-3.5 px-3 cursor-pointer hover:text-white transition-colors"
+                className="w-[130px] min-w-[130px] group py-3.5 px-3 cursor-pointer hover:text-white transition-colors"
               >
                 <div className="flex items-center">
                   <span>Regista</span>
                   {renderSortIndicator('regista')}
                 </div>
               </th>
-              <th className="w-[10%] py-3.5 px-3">Risoluzione</th>
+              <th className="w-[105px] min-w-[105px] py-3.5 px-2 text-center whitespace-nowrap">
+                Risoluzione
+              </th>
               <th
                 onClick={() => onSortChange('durata_min')}
-                className="w-[11%] group py-3.5 px-3 cursor-pointer hover:text-white transition-colors"
+                className="w-[110px] min-w-[110px] group py-3.5 px-3 cursor-pointer hover:text-white transition-colors whitespace-nowrap"
               >
                 <div className="flex items-center">
                   <span>Durata / Ep.</span>
@@ -99,7 +110,7 @@ export const MediaTable: React.FC<MediaTableProps> = ({
               </th>
               <th
                 onClick={() => onSortChange('dimensione_gb')}
-                className="w-[10%] group py-3.5 px-3 cursor-pointer hover:text-white transition-colors"
+                className="w-[100px] min-w-[100px] group py-3.5 px-3 cursor-pointer hover:text-white transition-colors whitespace-nowrap hidden lg:table-cell"
               >
                 <div className="flex items-center">
                   <span>Dimensione</span>
@@ -161,17 +172,19 @@ export const MediaTable: React.FC<MediaTableProps> = ({
                   </td>
 
                   {/* Section Badge */}
-                  <td className="py-3 px-3 whitespace-nowrap overflow-hidden">
-                    <SectionBadge section={item.section} />
+                  <td className="w-[100px] py-2.5 px-2 whitespace-nowrap text-center">
+                    <div className="flex items-center justify-center">
+                      <SectionBadge section={item.section} />
+                    </div>
                   </td>
 
                   {/* Year */}
-                  <td className="py-3 px-3 font-mono font-medium text-slate-300 whitespace-nowrap overflow-hidden">
+                  <td className="w-[80px] py-2.5 px-2 font-mono font-medium text-slate-300 whitespace-nowrap text-center">
                     {item.anno || '—'}
                   </td>
 
                   {/* Director */}
-                  <td className="py-3 px-3 text-slate-300 overflow-hidden" title={item.regista || undefined}>
+                  <td className="w-[130px] py-2.5 px-3 text-slate-300 overflow-hidden" title={item.regista || undefined}>
                     {item.regista ? (
                       <span className="text-xs text-amber-200/90 font-medium truncate block" title={item.regista}>
                         {item.regista}
@@ -182,12 +195,14 @@ export const MediaTable: React.FC<MediaTableProps> = ({
                   </td>
 
                   {/* Resolution */}
-                  <td className="py-3 px-3 whitespace-nowrap overflow-hidden">
-                    <ResolutionBadge resolution={item.risoluzione} />
+                  <td className="w-[105px] py-2.5 px-2 whitespace-nowrap text-center">
+                    <div className="flex items-center justify-center">
+                      <ResolutionBadge resolution={item.risoluzione} />
+                    </div>
                   </td>
 
                   {/* Duration */}
-                  <td className="py-3 px-3 font-mono whitespace-nowrap text-slate-400 overflow-hidden">
+                  <td className="w-[110px] py-2.5 px-3 font-mono whitespace-nowrap text-slate-400 overflow-hidden">
                     {isSeries ? (
                       <span title={`${item.numero_episodi} episodi`}>
                         {item.numero_episodi} ep ({formatDuration(item.durata_min)})
@@ -197,8 +212,8 @@ export const MediaTable: React.FC<MediaTableProps> = ({
                     )}
                   </td>
 
-                  {/* Storage Size */}
-                  <td className="py-3 px-3 font-mono font-semibold text-slate-200 whitespace-nowrap overflow-hidden">
+                  {/* Storage Size (hidden on compressed screens < lg) */}
+                  <td className="w-[100px] py-2.5 px-3 font-mono font-semibold text-slate-200 whitespace-nowrap overflow-hidden hidden lg:table-cell">
                     {formatStorage(item.dimensione_gb)}
                   </td>
                 </tr>
