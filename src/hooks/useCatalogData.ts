@@ -61,7 +61,7 @@ export function useCatalogData(): UseCatalogDataResult {
 
         const baseUrl = import.meta.env.BASE_URL || './';
         const dataUrl = `${baseUrl.endsWith('/') ? baseUrl : baseUrl + '/'}data/catalog_data.json`;
-        const response = await fetch(dataUrl);
+        const response = await fetch(dataUrl, { cache: 'no-cache' });
         if (!response.ok) {
           throw new Error(`Errore HTTP ${response.status}: Impossibile caricare il catalogo.`);
         }
