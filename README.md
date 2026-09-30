@@ -53,7 +53,7 @@
   - Single-click copy of absolute local storage paths with visual feedback.
 - 🛡️ **Privacy & Security Focused**:
   - Public repository contains only the web application code and bundled catalog database (`catalog_data.json`).
-  - Internal extraction scripts (`export_plex.py`), private server paths, and redundant CSV exports are kept strictly local and excluded via `.gitignore`.
+  - Internal extraction scripts (`scripts/export_plex.py`), local batch/shell launchers (`*.bat`, `*.cmd`, `*.ps1`), environment configurations (`.env`), private network paths, and raw CSV exports are kept strictly local and excluded via `.gitignore`.
   - Automatic **7-Day Freshness Monitor**: checks catalog timestamp and alerts the user if data needs synchronization from the Plex server.
 - 🚀 **Zero-Lag Architecture**: In-memory indexing and single-pass normalization handling **2,969 titles** and over **24,670 episodes** at steady 60 FPS.
 
@@ -147,6 +147,9 @@ plex-media-catalog/
 ├── scripts/                       # Local offline maintenance (local only, in .gitignore)
 │   ├── export_plex.py             # Python script extracting data from Plex SQLite DB
 │   └── enrich_catalog.cjs         # Metadata enrichment helper
+├── .env.example                   # Template configuration file for local extraction
+├── .env                           # Local environment configuration (local only, in .gitignore)
+├── *.bat                          # Local batch launchers (local only, in .gitignore)
 ├── src/
 │   ├── components/
 │   │   ├── common/                # Reusable UI badges and stat cards

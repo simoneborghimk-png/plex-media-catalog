@@ -319,19 +319,21 @@ Per estrarre i metadati completi:
 2. **Attori Principali (Cast)**: registrati in `taggings` con `tag_type = 6`. Il campo `tg."index"` definisce l'ordine di importanza/billing (0 = protagonista primario, 1 = co-protagonista, ecc.). Vengono estratti i primi 5 attori in ordine di indice.
 3. **Generi (Genres)**: registrati in `taggings` con `tag_type = 1`.
 4. Lo script effettua una copia temporanea a caldo (`safe_copy_database`) includendo i file `-wal` e `-shm` per evitare deadlock SQLite durante l'esecuzione del server Plex.
-5. I file generati (`catalog_data.json` e i CSV di supporto) vengono sincronizzati via LAN SMB su `DEV_MACHINE_DATA_DIR`.
+5. Lo script viene eseguito direttamente dal PC di sviluppo Windows tramite `scripts/export_plex.py` (o tramite lo script launcher batch locale `aggiorna_catalogo.bat`), legge il database dal server Plex via percorso di rete UNC protetto (es. `\\SIMONE-PLEXSRV\Databases\...`), ne effettua una copia rapida locale in temp ed estrae i dati direttamente in `data/catalog_data.json`, `data/*.csv` e le locandine WebP in `public/posters/` senza necessità di sincronizzazioni intermedie.
 
 ### 6.2 Politica di Sicurezza & Igiene del Repository Git
 - **Dati Pubblici vs Privati**:
   - `data/catalog_data.json` è la sorgente dati del catalogo multimediale utilizzata dall'applicazione web. Per tutelare la privacy e la sicurezza dei dispositivi privati, il catalogo pubblico non include percorsi locali di storage (`file_path`).
-  - La cartella `scripts/` (contenente script di estrazione con logiche private di sincronizzazione LAN e query di manutenzione locale) è **esclusa da Git** tramite `.gitignore` e preservata esclusivamente in locale.
+  - Gli script batch e launcher locali (`*.bat`, `*.cmd`, `*.ps1`, come `aggiorna_catalogo.bat`) e il file di configurazione locale `.env` contengono percorsi di sistema, credenziali e token: sono **rigorosamente esclusi da Git** tramite `.gitignore` e preservati solo in locale.
+  - La cartella `scripts/` (contenente lo script di estrazione `export_plex.py` e strumenti ausiliari) è **esclusa da Git** tramite `.gitignore` e preservata esclusivamente in locale.
   - I file tabulari grezzi `data/*.csv` sono esclusi da Git tramite `.gitignore` e preservati localmente.
   - La cartella di configurazione AI `.agents/` è esclusa da Git tramite `.gitignore` e preservata localmente.
+  - Il file `.env.example` è invece tracciato pubblicamente per fornire un modello di riferimento con placeholder neutri.
 
 ### 6.3 Politica di Verifica Freschezza (7 Giorni)
 - Ogni esportazione appone nel JSON il timestamp ISO `metadata.last_updated` e `metadata.last_updated_display`.
 - Sia l'assistente AI sia l'interfaccia utente (tramite badge e banner in `Header.tsx`) verificano se `daysSinceUpdate > 7`:
-  - Se i dati superano i 7 giorni, viene mostrato un avviso esplicito che invita l'utente a rilanciare `export_plex.py` sul server Plex.
+  - Se i dati superano i 7 giorni, viene mostrato un avviso esplicito che invita l'utente a rilanciare l'aggiornamento catalogo direttamente dal PC di sviluppo (tramite `aggiorna_catalogo.bat` o `npm run update-catalog`).
 
 ---
 

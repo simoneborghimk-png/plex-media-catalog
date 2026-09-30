@@ -32,6 +32,10 @@ pnpm-debug.log*
 
 # Local extraction & maintenance scripts (contains local paths and private server logic)
 scripts/
+*.bat
+*.cmd
+*.ps1
+
 
 # Local AI agent configurations & rules
 .agents/
