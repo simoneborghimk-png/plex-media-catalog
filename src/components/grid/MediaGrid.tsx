@@ -55,7 +55,7 @@ export const MediaGrid: React.FC<MediaGridProps> = ({
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 min-[1900px]:grid-cols-6 gap-3 sm:gap-3.5">
         {items.map((item) => (
           <MediaCard
-            key={`${item.section}-${item.id}`}
+            key={item.uniqueKey || `${item.section}-${item.id}`}
             item={item}
             onSelect={onSelectItem}
           />

@@ -222,34 +222,43 @@ export function useCatalogFilter(items: UnifiedMediaItem[]): UseCatalogFilterRes
     const modifier = sortDirection === 'asc' ? 1 : -1;
 
     list.sort((a, b) => {
+      let diff = 0;
+
       if (sortBy === 'titolo') {
-        return modifier * a.titolo.localeCompare(b.titolo, 'it', { sensitivity: 'base' });
-      }
-      if (sortBy === 'anno') {
+        diff = modifier * a.titolo.localeCompare(b.titolo, 'it', { sensitivity: 'base' });
+      } else if (sortBy === 'anno') {
         const yearA = a.anno ?? 0;
         const yearB = b.anno ?? 0;
-        return modifier * (yearA - yearB);
-      }
-      if (sortBy === 'dimensione_gb') {
-        return modifier * ((a.dimensione_gb || 0) - (b.dimensione_gb || 0));
-      }
-      if (sortBy === 'durata_min') {
-        return modifier * ((a.durata_totale_min || 0) - (b.durata_totale_min || 0));
-      }
-      if (sortBy === 'voto') {
+        diff = modifier * (yearA - yearB);
+      } else if (sortBy === 'dimensione_gb') {
+        diff = modifier * ((a.dimensione_gb || 0) - (b.dimensione_gb || 0));
+      } else if (sortBy === 'durata_min') {
+        diff = modifier * ((a.durata_totale_min || 0) - (b.durata_totale_min || 0));
+      } else if (sortBy === 'voto') {
         const voteA = a.voto ?? -1;
         const voteB = b.voto ?? -1;
-        return modifier * (voteA - voteB);
-      }
-      if (sortBy === 'regista') {
+        diff = modifier * (voteA - voteB);
+      } else if (sortBy === 'regista') {
         const regA = a.regista || '';
         const regB = b.regista || '';
-        if (!regA && !regB) return 0;
-        if (!regA) return 1;
-        if (!regB) return -1;
-        return modifier * regA.localeCompare(regB, 'it', { sensitivity: 'base' });
+        if (!regA && !regB) diff = 0;
+        else if (!regA) diff = 1;
+        else if (!regB) diff = -1;
+        else diff = modifier * regA.localeCompare(regB, 'it', { sensitivity: 'base' });
       }
-      return 0;
+
+      // Tie-breaker secondario: se parità sul campo scelto, ordina per titolo (nella stessa direzione)
+      if (diff === 0 && sortBy !== 'titolo') {
+        diff = modifier * a.titolo.localeCompare(b.titolo, 'it', { sensitivity: 'base' });
+      }
+
+      // Tie-breaker terziario: per titoli identici (es. edizioni multiple), differenzia per storage o uniqueKey
+      if (diff === 0) {
+        const sizeDiff = (b.dimensione_gb || 0) - (a.dimensione_gb || 0);
+        diff = sizeDiff !== 0 ? sizeDiff : (a.uniqueKey || '').localeCompare(b.uniqueKey || '');
+      }
+
+      return diff;
     });
 
     return list;

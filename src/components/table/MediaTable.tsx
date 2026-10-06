@@ -125,7 +125,7 @@ export const MediaTable: React.FC<MediaTableProps> = ({
 
               return (
                 <tr
-                  key={`${item.section}-${item.id}`}
+                  key={item.uniqueKey || `${item.section}-${item.id}`}
                   onClick={() => onSelectItem(item)}
                   className="hover:bg-slate-800/60 cursor-pointer transition-colors group"
                 >

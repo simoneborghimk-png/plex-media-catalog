@@ -84,6 +84,7 @@ export interface RawCatalogData {
 
 export interface UnifiedMediaItem {
   id: number;
+  uniqueKey: string;
   section: MediaSection;
   titolo: string;
   titolo_originale: string;

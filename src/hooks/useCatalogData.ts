@@ -76,6 +76,14 @@ export function useCatalogData(): UseCatalogDataResult {
         const unifiedList: UnifiedMediaItem[] = [];
         let totalStorageGb = 0;
         let totalEpisodesCount = 0;
+        const seenKeyCounts = new Map<string, number>();
+
+        function generateUniqueKey(section: string, id: number): string {
+          const baseKey = `${section}-${id}`;
+          const count = (seenKeyCounts.get(baseKey) || 0) + 1;
+          seenKeyCounts.set(baseKey, count);
+          return count === 1 ? baseKey : `${baseKey}-v${count}`;
+        }
 
         // 1. Process Films
         const films = rawData.catalog.film || [];
@@ -110,6 +118,7 @@ export function useCatalogData(): UseCatalogDataResult {
 
           unifiedList.push({
             id: film.id,
+            uniqueKey: generateUniqueKey('film', film.id),
             section: 'film',
             titolo: film.titolo,
             titolo_originale: film.titolo_originale || '',
@@ -221,6 +230,7 @@ export function useCatalogData(): UseCatalogDataResult {
 
             unifiedList.push({
               id: series.id,
+              uniqueKey: generateUniqueKey(section, series.id),
               section,
               titolo: series.titolo,
               titolo_originale: series.titolo_originale || '',
