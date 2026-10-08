@@ -14,9 +14,9 @@ Memoria calda per agenti AI. Consultazione obbligatoria ad avvio sessione (Azion
 ---
 
 ## 2. Metriche Catalogo & Freschezza Dati
-- **File sorgente JSON**: `data/catalog_data.json` (~28 MB, 2.973 titoli totali)
-  - `film`: 2.521 titoli | `serie_tv`: 168 serie | `anime`: 215 serie | `cartoon`: 69 serie
-- **Ultimo aggiornamento dataset**: `05/10/2026 alle 21:14` (Stato: Fresco, $\le 7$ giorni)
+- **File sorgente JSON**: `data/catalog_data.json` (~28 MB, 2.975 titoli totali)
+  - `film`: 2.523 titoli | `serie_tv`: 168 serie | `anime`: 215 serie | `cartoon`: 69 serie
+- **Ultimo aggiornamento dataset**: `08/10/2026 alle 23:28` (Stato: Fresco, $\le 7$ giorni)
 - **Locandine**: `public/posters/<id>.webp` (2.974 locandine ottimizzate WebP)
 - **Script estrazione**: `scripts/export_plex.py` (locale, protetto da `.gitignore`)
 
@@ -36,8 +36,6 @@ Consultare chirurgicamente il singolo file in `docs/adr/` all'occorrenza (0 toke
 
 ## 4. Backlog Attivo & Stato Lavori
 - [x] Sincronizzazione workflow GitHub Actions Pages (`cancel-in-progress: false`).
-- [x] Aggiornamento deploy GitHub Pages con catalogo del 05/10/2026.
-- [x] Definizione architettura governance, guardrail token e memoria a 3 livelli.
-- [x] Risolto bug ordinamento/chiavi duplicate ("Transformers - Il risveglio", ADR-001/ADR-003).
-- [x] Validazione headless con `npm run build` completata (0 errori).
-- [ ] Revisione visiva utente su `:5173` e autorizzazione per eventuale push.
+- [x] Aggiornamento catalogo da database Plex al 08/10/2026 (2.975 titoli).
+- [x] Validazione headless con `npm run build` completata con successo (0 errori).
+- [x] Deploy automatico su produzione (GitHub Pages) via push su `main`.
