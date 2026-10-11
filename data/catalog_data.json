@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "last_updated": "2026-10-08T23:28:20.710359+02:00",
-    "last_updated_display": "08/10/2026 alle 23:28",
-    "total_titles": 2975
+    "last_updated": "2026-10-11T10:01:01.882340+02:00",
+    "last_updated_display": "11/10/2026 alle 10:01",
+    "total_titles": 2976
   },
   "catalog": {
     "film": [
@@ -99056,6 +99056,175 @@
                 "tracce_audio": "it (AC3), en (AC3)",
                 "sottotitoli": "it (SRT), en (SRT), en (SRT)",
                 "dimensione_gb": 1.07
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 53146,
+        "titolo": "Carrie",
+        "titolo_originale": "",
+        "anno": 2026,
+        "trama": "Dopo che la morte improvvisa e prematura del padre la catapulta nell'implacabile realtà di un liceo pubblico, Carrie è costretta ad affrontare un episodio di bullismo diventato virale che sconvolge la sua comunità, l'incessante pressione e la disinvolta crudeltà dell'era dei social media, oltre al risveglio di misteriosi poteri telecinetici che emergono con l'arrivo dell'adolescenza.",
+        "voto": null,
+        "regista": "",
+        "attori": [
+          "Summer H. Howell",
+          "Samantha Sloyan",
+          "Siena Agudong",
+          "Alison Thornton",
+          "Joel Oulette"
+        ],
+        "generi": [
+          "Dramma",
+          "Horror",
+          "Mistero",
+          "Sci-Fi & Fantasy"
+        ],
+        "has_poster": false,
+        "poster": null,
+        "stagioni": [
+          {
+            "id": 53147,
+            "stagione": 1,
+            "titolo_stagione": "Stagione 1",
+            "episodi": [
+              {
+                "id": 53148,
+                "numero": 1,
+                "titolo": "MENARCA",
+                "trama": "L'inizio di un nuovo giorno",
+                "voto": null,
+                "durata_min": 56,
+                "risoluzione": "1080p FHD",
+                "larghezza": 1920,
+                "altezza": 960,
+                "codec_video": "H264",
+                "codec_audio": "EAC3",
+                "canali_audio": 6,
+                "tracce_audio": "it (EAC3), en-US (EAC3)",
+                "sottotitoli": "it-IT (SRT), it-IT (SRT), en-US (SRT), en-US (SRT)",
+                "dimensione_gb": 3.78
+              },
+              {
+                "id": 53149,
+                "numero": 2,
+                "titolo": "LINGUA STRANIERA",
+                "trama": "Nuove competenze comunicative di una cultura sconosciuta",
+                "voto": null,
+                "durata_min": 52,
+                "risoluzione": "1080p FHD",
+                "larghezza": 1920,
+                "altezza": 960,
+                "codec_video": "H264",
+                "codec_audio": "EAC3",
+                "canali_audio": 6,
+                "tracce_audio": "it (EAC3), en-US (EAC3)",
+                "sottotitoli": "it-IT (SRT), it-IT (SRT), en-US (SRT), en-US (SRT)",
+                "dimensione_gb": 3.64
+              },
+              {
+                "id": 53150,
+                "numero": 3,
+                "titolo": "SCIENZE SOCIALI",
+                "trama": "Come interagiscono persone, comunità e società",
+                "voto": null,
+                "durata_min": 50,
+                "risoluzione": "1080p FHD",
+                "larghezza": 1920,
+                "altezza": 960,
+                "codec_video": "H264",
+                "codec_audio": "EAC3",
+                "canali_audio": 6,
+                "tracce_audio": "it (EAC3), en-US (EAC3)",
+                "sottotitoli": "it-IT (SRT), it-IT (SRT), en-US (SRT), en-US (SRT)",
+                "dimensione_gb": 3.27
+              },
+              {
+                "id": 53154,
+                "numero": 4,
+                "titolo": "ARTI DRAMMATICHE",
+                "trama": "Voce, movimento e improvvisazione",
+                "voto": null,
+                "durata_min": 53,
+                "risoluzione": "1080p FHD",
+                "larghezza": 1920,
+                "altezza": 960,
+                "codec_video": "H264",
+                "codec_audio": "EAC3",
+                "canali_audio": 6,
+                "tracce_audio": "it (EAC3), en-US (EAC3)",
+                "sottotitoli": "it-IT (SRT), it-IT (SRT), en-US (SRT), en-US (SRT)",
+                "dimensione_gb": 3.34
+              },
+              {
+                "id": 53152,
+                "numero": 5,
+                "titolo": "EDUCAZIONE FISICA",
+                "trama": "Salute, attività fisica e allenamento",
+                "voto": null,
+                "durata_min": 49,
+                "risoluzione": "1080p FHD",
+                "larghezza": 1920,
+                "altezza": 960,
+                "codec_video": "H264",
+                "codec_audio": "EAC3",
+                "canali_audio": 6,
+                "tracce_audio": "it (EAC3), en-US (EAC3)",
+                "sottotitoli": "it-IT (SRT), en-US (SRT), en-US (SRT), it-IT (SRT)",
+                "dimensione_gb": 3.35
+              },
+              {
+                "id": 53155,
+                "numero": 6,
+                "titolo": "ECONOMIA DOMESTICA",
+                "trama": "Competenze pratiche per vivere in autonomia",
+                "voto": null,
+                "durata_min": 60,
+                "risoluzione": "1080p FHD",
+                "larghezza": 1920,
+                "altezza": 960,
+                "codec_video": "H264",
+                "codec_audio": "EAC3",
+                "canali_audio": 6,
+                "tracce_audio": "it (EAC3), en-US (EAC3)",
+                "sottotitoli": "it-IT (SRT), it-IT (SRT), en-US (SRT), en-US (SRT)",
+                "dimensione_gb": 4.16
+              },
+              {
+                "id": 53153,
+                "numero": 7,
+                "titolo": "LETTERATURA ROMANTICA",
+                "trama": "Il potere delle emozioni e dell'esperienza individuale",
+                "voto": null,
+                "durata_min": 54,
+                "risoluzione": "1080p FHD",
+                "larghezza": 1920,
+                "altezza": 960,
+                "codec_video": "H264",
+                "codec_audio": "EAC3",
+                "canali_audio": 6,
+                "tracce_audio": "it (EAC3), en-US (EAC3)",
+                "sottotitoli": "it-IT (SRT), it-IT (SRT), en-US (SRT), en-US (SRT)",
+                "dimensione_gb": 3.75
+              },
+              {
+                "id": 53151,
+                "numero": 8,
+                "titolo": "FISICA AVANZATA",
+                "trama": "A ogni azione corrisponde una reazione uguale e contraria",
+                "voto": null,
+                "durata_min": 49,
+                "risoluzione": "1080p FHD",
+                "larghezza": 1920,
+                "altezza": 960,
+                "codec_video": "H264",
+                "codec_audio": "EAC3",
+                "canali_audio": 6,
+                "tracce_audio": "it (EAC3), en-US (EAC3)",
+                "sottotitoli": "it-IT (SRT), it-IT (SRT), en-US (SRT), en-US (SRT)",
+                "dimensione_gb": 3.26
               }
             ]
           }
