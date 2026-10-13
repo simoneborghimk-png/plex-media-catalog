@@ -16,7 +16,7 @@ Memoria calda per agenti AI. Consultazione obbligatoria ad avvio sessione (Azion
 ## 2. Metriche Catalogo & Freschezza Dati
 - **File sorgente JSON**: `data/catalog_data.json` (~28 MB, 2.976 titoli totali)
   - `film`: 2.523 titoli | `serie_tv`: 169 serie | `anime`: 215 serie | `cartoon`: 69 serie
-- **Ultimo aggiornamento dataset**: `11/10/2026 alle 10:01` (Stato: Fresco, $\le 7$ giorni)
+- **Ultimo aggiornamento dataset**: `14/10/2026 alle 00:23` (Stato: Fresco, $\le 7$ giorni)
 - **Locandine**: `public/posters/<id>.webp` (2.974 locandine ottimizzate WebP)
 - **Script estrazione**: `scripts/export_plex.py` (locale, protetto da `.gitignore`)
 
@@ -36,6 +36,6 @@ Consultare chirurgicamente il singolo file in `docs/adr/` all'occorrenza (0 toke
 
 ## 4. Backlog Attivo & Stato Lavori
 - [x] Sincronizzazione workflow GitHub Actions Pages (`cancel-in-progress: false`).
-- [x] Aggiornamento catalogo da database Plex al 11/10/2026 (2.976 titoli).
+- [x] Aggiornamento catalogo da database Plex al 14/10/2026 (2.976 titoli).
 - [x] Validazione headless con `npm run build` completata con successo (0 errori).
 - [x] Deploy automatico su produzione (GitHub Pages) via push su `main`.
