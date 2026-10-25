@@ -115,20 +115,6 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        {/* 7-Day Outdated Warning Banner */}
-        {stats && stats.isOutdated && (
-          <div className="my-2.5 p-3 rounded-xl bg-gradient-to-r from-amber-950/40 via-amber-900/20 to-slate-900/40 border border-amber-500/30 flex items-center justify-between text-xs text-amber-200 shadow-md">
-            <div className="flex items-center gap-2.5">
-              <div className="p-1 rounded-lg bg-amber-500/20 text-amber-400 shrink-0">
-                <AlertTriangle className="w-4 h-4" />
-              </div>
-              <div>
-                <span className="font-bold text-amber-300">Dati catalogo non aggiornati da oltre 7 giorni ({stats.daysSinceUpdate} giorni fa - {stats.lastUpdatedDisplay}): </span>
-                <span className="text-slate-300">Esegui lo script <code className="px-1.5 py-0.5 rounded bg-black/40 font-mono text-amber-300 text-[11px]">export_plex.py</code> sul server Plex per sincronizzare gli ultimi metadati.</span>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Section Tabs Quick Selector (Desktop) & Mobile Search Bar */}
         <div className="py-2.5 flex items-center justify-between gap-3 min-w-0">
