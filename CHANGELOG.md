@@ -4,6 +4,14 @@ Tutti i cambiamenti significativi a questo progetto sono documentati in questo f
 
 ---
 
+## [1.2.1] - 2026-10-25
+### Modificato
+- **Dev Server**: Fissata stabilmente la porta locale su `5181` con `strictPort: true` in `vite.config.ts` e aggiornate tutte le linee guida operative e documentali.
+- **UI Header**: Rimosso banner di avviso catalogo datato oltre 7 giorni da `Header.tsx`.
+- **Dataset Catalogo**: Sincronizzato ed esportato catalogo Plex aggiornato a 2.980 titoli totali (2.527 film, 169 serie TV, 215 anime, 69 cartoon).
+
+---
+
 ## [1.2.0] - 2026-10-06
 ### Aggiunto
 - **Architettura di Governance & Token Optimization**: Integrazione modello a 3 livelli di memoria (`PROGRESS.md`, `docs/SYSTEM_MAP.md`, `docs/adr/`).

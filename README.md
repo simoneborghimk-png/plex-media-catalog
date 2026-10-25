@@ -104,7 +104,7 @@ npm install
 ```bash
 npm run dev
 ```
-Open your browser at `http://localhost:5173/`.
+Open your browser at `http://localhost:5181/` (fixed port 5181).
 
 ### 4. Create production build
 ```bash

@@ -379,7 +379,7 @@ Per estrarre i metadati completi:
   - Ogni header mostra chevron reattiva, badge numerico con elementi attivi e pulsante contestuale `Deseleziona`.
 
 ### 7.5 Workflow e Rilasci
-- Sviluppare e verificare sempre in locale (`http://localhost:5173/`).
+- Sviluppare e verificare sempre in locale (`http://localhost:5181/` - porta fissa `5181`).
 - **Nessun commit o push automatico su Git senza richiesta esplicita dell'utente.**
 
 ---

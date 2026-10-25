@@ -7,17 +7,17 @@ Memoria calda per agenti AI. Consultazione obbligatoria ad avvio sessione (Azion
 ## 1. Coordinate & Stack Attivo
 - **Progetto**: Plex Media Catalog (Esploratore Web per librerie Plex locali)
 - **Stack**: React 18.3, Vite 6.1, TypeScript 5.7, TailwindCSS 3.4, Lucide React
-- **Dev Server**: `http://localhost:5173/` (`npm run dev`)
+- **Dev Server**: `http://localhost:5181/` (`npm run dev` - porta fissa `5181`)
 - **Produzione**: GitHub Pages (`https://simoneborghimk-png.github.io/plex-media-catalog/`)
 - **Pipeline CI**: `.github/workflows/deploy.yml` (branch `main`, `cancel-in-progress: false`)
 
 ---
 
 ## 2. Metriche Catalogo & Freschezza Dati
-- **File sorgente JSON**: `data/catalog_data.json` (~28 MB, 2.976 titoli totali)
-  - `film`: 2.523 titoli | `serie_tv`: 169 serie | `anime`: 215 serie | `cartoon`: 69 serie
-- **Ultimo aggiornamento dataset**: `14/10/2026 alle 00:23` (Stato: Fresco, $\le 7$ giorni)
-- **Locandine**: `public/posters/<id>.webp` (2.974 locandine ottimizzate WebP)
+- **File sorgente JSON**: `data/catalog_data.json` (~28 MB, 2.980 titoli totali)
+  - `film`: 2.527 titoli | `serie_tv`: 169 serie | `anime`: 215 serie | `cartoon`: 69 serie
+- **Ultimo aggiornamento dataset**: `25/10/2026 alle 10:47` (Stato: Fresco, $\le 7$ giorni)
+- **Locandine**: `public/posters/<id>.webp` (ottimizzate WebP)
 - **Script estrazione**: `scripts/export_plex.py` (locale, protetto da `.gitignore`)
 
 ---
