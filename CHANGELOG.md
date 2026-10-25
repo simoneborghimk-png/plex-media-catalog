@@ -10,6 +10,10 @@ Tutti i cambiamenti significativi a questo progetto sono documentati in questo f
 - **UI Header**: Rimosso banner di avviso catalogo datato oltre 7 giorni da `Header.tsx`.
 - **Dataset Catalogo**: Sincronizzato ed esportato catalogo Plex aggiornato a 2.980 titoli totali (2.527 film, 169 serie TV, 215 anime, 69 cartoon).
 
+### Aggiunto
+- **Procedura Script Estemporanei di Copia Media**: Codificata la procedura per generare script PowerShell/Batch autonomi basati su `robocopy` a partire dai metadati CSV locali, con protocollo di eliminazione immediata post-esecuzione e salvaguardia della privacy dei percorsi disco (regola `.agents/rules/adhoc_copy_scripts.md` e Sezione 8 in `PROJECT_GUIDELINES.md`).
+
+
 ---
 
 ## [1.2.0] - 2026-10-06

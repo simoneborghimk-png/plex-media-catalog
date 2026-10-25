@@ -383,4 +383,32 @@ Per estrarre i metadati completi:
 - **Nessun commit o push automatico su Git senza richiesta esplicita dell'utente.**
 
 ---
+
+## 8. Procedura per Script Estemporanei di Copia & Backup Media
+
+### 8.1 Contesto e Privacy dei Percorsi
+- Le richieste di copia/backup per liste specifiche di titoli sono operazioni **estemporanee e isolate**.
+- I percorsi effettivi (`L:\`, `M:\`, `N:\`, `O:\`, `P:\`, `Q:\`, `R:\`, `S:\`, `T:\`) espongono la configurazione dello storage locale del server Plex e **non devono mai essere inclusi nel repository Git pubblico**.
+- Per sicurezza:
+  - `*.ps1`, `*.bat`, `*.cmd`, `scripts/` e `data/*.csv` sono protetti e ignorati a monte tramite `.gitignore`.
+  - Gli script generati devono essere **eliminati dal workspace locale** non appena l'utente conferma di averli trasferiti o avviati.
+
+### 8.2 Sorgente Dati per l'Estrazione (`file_path`)
+- Mentre `data/catalog_data.json` rimuove intenzionalmente `file_path` per sicurezza e compattezza, i file CSV locali mantengono la traccia completa:
+  - `data/film_metadata.csv`: percorsi puntuali ai singoli file video (`.mkv`, `.mp4`).
+  - `data/serie_tv_metadata.csv`, `data/anime_metadata.csv`, `data/cartoon_metadata.csv`: percorsi di ogni episodio da cui estrarre la cartella radice dello show (es. `Q:\The Mandalorian` o `R:\Dragon Ball`).
+
+### 8.3 Standard di Generazione dello Script di Copia
+- **PowerShell (`.ps1`)**:
+  - Salvare rigorosamente con codifica **UTF-8 con BOM** (`utf-8-sig`) per garantire la corretta interpretazione dei caratteri speciali e accentati su Windows PowerShell 5.1 nativo.
+  - Usare `[PSCustomObject]` per le strutture dati e sintassi compatibile con PowerShell 5.1 (evitare operatori ternari).
+  - Usare **`robocopy`** come motore ad alte prestazioni:
+    - File singoli (Film): `robocopy "source_dir" "target_dir" "filename.mkv" /MT:4 /Z /R:2 /W:3 /NP /NDL`
+    - Cartelle complete (Serie TV / Anime): `robocopy "source_dir" "target_dir" /E /MT:8 /Z /XO /R:2 /W:3 /NP /NDL`
+  - Calcolare preventivamente lo spazio totale richiesto e verificare lo spazio libero sull'unità di destinazione.
+- **Batch Wrapper (`.bat`)**:
+  - File `.bat` di avvio rapido con doppio clic (`powershell -NoProfile -ExecutionPolicy Bypass -File ...`).
+
+---
 *Fine delle linee guida architetturali e di design.*
+

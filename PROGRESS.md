@@ -36,6 +36,8 @@ Consultare chirurgicamente il singolo file in `docs/adr/` all'occorrenza (0 toke
 
 ## 4. Backlog Attivo & Stato Lavori
 - [x] Sincronizzazione workflow GitHub Actions Pages (`cancel-in-progress: false`).
-- [x] Aggiornamento catalogo da database Plex al 14/10/2026 (2.976 titoli).
+- [x] Aggiornamento catalogo da database Plex al 25/10/2026 (2.980 titoli totali).
+- [x] Fissata porta dev server su `5181` e rimosso banner catalogo datato oltre 7 giorni.
+- [x] Codificazione procedura per script estemporanei di copia/backup media (`.agents/rules/adhoc_copy_scripts.md` e Sezione 8 in `PROJECT_GUIDELINES.md`).
 - [x] Validazione headless con `npm run build` completata con successo (0 errori).
-- [x] Deploy automatico su produzione (GitHub Pages) via push su `main`.
+
